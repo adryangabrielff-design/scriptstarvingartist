@@ -1,256 +1,264 @@
 --[[
-    Script GUI Simples - Auto Stand
-    Fácil de expandir e modificar
+    Script de Auto Stand - Menu Simples
+    Criado para facilitar expansões futuras
 ]]
 
-local player = game.Players.LocalPlayer
+-- Serviços
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
 local mouse = player:GetMouse()
-local guiService = game:GetService("GuiService")
-local tweenService = game:GetService("TweenService")
 
--- Variáveis de estado
-local menuAberto = false
-local autoStandAtivo = false
+-- Variáveis globais do menu
+local menu = {
+    aberto = true,
+    autoStandAtivo = false,
+    procurandoStand = false
+}
 
--- Criar ScreenGui principal
+-- Criar ScreenGui
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "MenuPrincipal"
-screenGui.Parent = player.PlayerGui
+screenGui.Parent = player:WaitForChild("PlayerGui")
 screenGui.ResetOnSpawn = false
 
--- Criar botão toggle do menu (sempre visível)
-local toggleButton = Instance.new("TextButton")
-toggleButton.Name = "ToggleMenu"
-toggleButton.Size = UDim2.new(0, 50, 0, 50)
-toggleButton.Position = UDim2.new(0, 20, 0, 20)
-toggleButton.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
-toggleButton.BackgroundTransparency = 0.2
-toggleButton.BorderSizePixel = 0
-toggleButton.Text = "≡"
-toggleButton.TextColor3 = Color3.new(1, 1, 1)
-toggleButton.TextScaled = true
-toggleButton.Font = Enum.Font.SourceSansBold
-toggleButton.Parent = screenGui
-
--- Arredondar bordas do toggle
-local toggleCorner = Instance.new("UICorner")
-toggleCorner.CornerRadius = UDim.new(0, 8)
-toggleCorner.Parent = toggleButton
-
--- Criar frame do menu (invisível inicialmente)
-local menuFrame = Instance.new("Frame")
-menuFrame.Name = "MenuFrame"
-menuFrame.Size = UDim2.new(0, 250, 0, 180)
-menuFrame.Position = UDim2.new(0, 80, 0, 20)
-menuFrame.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15)
-menuFrame.BackgroundTransparency = 0.1
-menuFrame.BorderSizePixel = 0
-menuFrame.Visible = false
-menuFrame.Parent = screenGui
-
--- Arredondar bordas do menu
-local menuCorner = Instance.new("UICorner")
-menuCorner.CornerRadius = UDim.new(0, 12)
-menuCorner.Parent = menuFrame
-
--- Adicionar título ao menu
-local menuTitle = Instance.new("TextLabel")
-menuTitle.Name = "Title"
-menuTitle.Size = UDim2.new(1, 0, 0, 40)
-menuTitle.Position = UDim2.new(0, 0, 0, 0)
-menuTitle.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
-menuTitle.BackgroundTransparency = 0.3
-menuTitle.BorderSizePixel = 0
-menuTitle.Text = "MENU PRINCIPAL"
-menuTitle.TextColor3 = Color3.new(1, 1, 1)
-menuTitle.TextScaled = true
-menuTitle.Font = Enum.Font.SourceSansBold
-menuTitle.Parent = menuFrame
-
--- Arredondar topo do título
-local titleCorner = Instance.new("UICorner")
-titleCorner.CornerRadius = UDim.new(0, 12)
-titleCorner.Parent = menuTitle
-
--- Criar container para os botões
-local buttonContainer = Instance.new("Frame")
-buttonContainer.Name = "ButtonContainer"
-buttonContainer.Size = UDim2.new(1, -20, 1, -50)
-buttonContainer.Position = UDim2.new(0, 10, 0, 45)
-buttonContainer.BackgroundTransparency = 1
-buttonContainer.Parent = menuFrame
-
--- Criar botão Auto Stand
-local autoStandButton = Instance.new("TextButton")
-autoStandButton.Name = "AutoStand"
-autoStandButton.Size = UDim2.new(1, 0, 0, 40)
-autoStandButton.Position = UDim2.new(0, 0, 0, 0)
-autoStandButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
-autoStandButton.BorderSizePixel = 0
-autoStandButton.Text = "AUTO STAND"
-autoStandButton.TextColor3 = Color3.new(1, 1, 1)
-autoStandButton.TextScaled = true
-autoStandButton.Font = Enum.Font.SourceSans
-autoStandButton.Parent = buttonContainer
-
-local autoStandCorner = Instance.new("UICorner")
-autoStandCorner.CornerRadius = UDim.new(0, 8)
-autoStandCorner.Parent = autoStandButton
-
--- Criar botão CLICK
-local clickButton = Instance.new("TextButton")
-clickButton.Name = "Click"
-clickButton.Size = UDim2.new(0.8, 0, 0, 40)
-clickButton.Position = UDim2.new(0.1, 0, 0, 50)
-clickButton.BackgroundColor3 = Color3.new(0.2, 0.6, 0.2)
-clickButton.BorderSizePixel = 0
-clickButton.Text = "CLICK"
-clickButton.TextColor3 = Color3.new(1, 1, 1)
-clickButton.TextScaled = true
-clickButton.Font = Enum.Font.SourceSansBold
-clickButton.Parent = buttonContainer
-
-local clickCorner = Instance.new("UICorner")
-clickCorner.CornerRadius = UDim.new(0, 8)
-clickCorner.Parent = clickButton
-
--- Adicionar status label
-local statusLabel = Instance.new("TextLabel")
-statusLabel.Name = "Status"
-statusLabel.Size = UDim2.new(1, 0, 0, 30)
-statusLabel.Position = UDim2.new(0, 0, 0, 100)
-statusLabel.BackgroundTransparency = 1
-statusLabel.Text = "Desativado"
-statusLabel.TextColor3 = Color3.new(1, 0.3, 0.3)
-statusLabel.TextScaled = true
-statusLabel.Font = Enum.Font.SourceSans
-statusLabel.Parent = buttonContainer
-
--- Função para alternar menu
-local function alternarMenu()
-    menuAberto = not menuAberto
-    menuFrame.Visible = menuAberto
+-- Função para criar botão toggle
+local function criarBotaoToggle(nome, posicao, callback)
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0, 150, 0, 35)
+    frame.Position = posicao
+    frame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    frame.BorderSizePixel = 0
+    frame.Parent = menu.frameMenu
     
-    -- Animação simples do botão toggle
-    if menuAberto then
-        toggleButton.Text = "✕"
-        toggleButton.BackgroundColor3 = Color3.new(0.4, 0.2, 0.2)
-    else
-        toggleButton.Text = "≡"
-        toggleButton.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
-    end
+    local borda = Instance.new("Frame")
+    borda.Size = UDim2.new(1, 0, 0, 2)
+    borda.Position = UDim2.new(0, 0, 1, -2)
+    borda.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+    borda.BorderSizePixel = 0
+    borda.Parent = frame
+    
+    local texto = Instance.new("TextLabel")
+    texto.Size = UDim2.new(1, -40, 1, 0)
+    texto.Position = UDim2.new(0, 10, 0, 0)
+    texto.BackgroundTransparency = 1
+    texto.Text = nome
+    texto.TextColor3 = Color3.fromRGB(255, 255, 255)
+    texto.TextXAlignment = Enum.TextXAlignment.Left
+    texto.Font = Enum.Font.GothamBold
+    texto.TextSize = 14
+    texto.Parent = frame
+    
+    local toggle = Instance.new("TextButton")
+    toggle.Size = UDim2.new(0, 30, 0, 30)
+    toggle.Position = UDim2.new(1, -35, 0, 2.5)
+    toggle.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+    toggle.Text = "OFF"
+    toggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+    toggle.TextSize = 10
+    toggle.Font = Enum.Font.GothamBold
+    toggle.BorderSizePixel = 0
+    toggle.AutoButtonColor = false
+    toggle.Parent = frame
+    
+    local ativo = false
+    
+    toggle.MouseButton1Click:Connect(function()
+        ativo = not ativo
+        
+        if ativo then
+            toggle.BackgroundColor3 = Color3.fromRGB(50, 255, 50)
+            toggle.Text = "ON"
+            borda.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+        else
+            toggle.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+            toggle.Text = "OFF"
+            borda.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+        end
+        
+        if callback then
+            callback(ativo)
+        end
+    end)
+    
+    return toggle
 end
 
--- Função para encontrar e interagir com botões Stand
-local function encontrarEAtivarStand()
-    if not autoStandAtivo then return end
+-- Função do Auto Stand
+local function autoStandFunction(estado)
+    menu.autoStandAtivo = estado
     
-    local stands = {}
-    
-    -- Procurar botões chamados "Stand" em todas as partes
-    for _, objeto in pairs(workspace:GetDescendants()) do
-        if objeto:IsA("Part") or objeto:IsA("MeshPart") or objeto:IsA("BasePart") then
-            if objeto.Name:lower():find("stand") then
-                table.insert(stands, objeto)
-            end
-        end
-        -- Procurar também em ClickDetectors e ProximityPrompts
-        if objeto:IsA("ClickDetector") and objeto.Parent and objeto.Parent.Name:lower():find("stand") then
-            table.insert(stands, objeto.Parent)
-        end
-        if objeto:IsA("ProximityPrompt") and objeto.Parent and objeto.Parent.Name:lower():find("stand") then
-            table.insert(stands, objeto.Parent)
-        end
-    end
-    
-    if #stands > 0 then
-        -- Escolher stand aleatório
-        local standEscolhido = stands[math.random(1, #stands)]
+    if estado and not menu.procurandoStand then
+        menu.procurandoStand = true
+        print("🔍 Procurando stands disponíveis...")
         
-        -- Teleportar jogador
-        if standEscolhido:IsA("BasePart") then
-            player.Character:SetPrimaryPartCFrame(standEscolhido.CFrame + Vector3.new(0, 3, 0))
+        -- Função para encontrar e interagir com Stand
+        local function encontrarStand()
+            if not menu.autoStandAtivo then return end
             
-            -- Aguardar um pouco
-            task.wait(0.5)
+            local standsDisponiveis = {}
             
-            -- Tentar ativar o stand
-            local clickDetector = standEscolhido:FindFirstChildOfClass("ClickDetector")
-            local prompt = standEscolhido:FindFirstChildOfClass("ProximityPrompt")
+            -- Procurar botões "Stand" no mapa
+            for _, objeto in ipairs(workspace:GetDescendants()) do
+                if objeto:IsA("TextButton") or objeto:IsA("Part") or objeto:IsA("BasePart") then
+                    if objeto.Name:find("Stand") then
+                        -- Verificar se tem texto de player ocupando
+                        local textoOcupado = objeto:FindFirstChild("TextLabel") 
+                            or objeto.Parent:FindFirstChild("TextLabel")
+                            or objeto:FindFirstChild("BillboardGui")
+                        
+                        local ocupado = false
+                        
+                        if textoOcupado then
+                            local texto = textoOcupado.Text or ""
+                            if texto:find("JARRA DE PONTA") or texto:find("Artista da Dica") then
+                                ocupado = true
+                            end
+                        end
+                        
+                        -- Verificar também por BillboardGui
+                        for _, child in ipairs(objeto:GetDescendants()) do
+                            if child:IsA("BillboardGui") and child:FindFirstChild("TextLabel") then
+                                local texto = child.TextLabel.Text or ""
+                                if texto:find("JARRA DE PONTA") or texto:find("Artista da Dica") then
+                                    ocupado = true
+                                end
+                            end
+                        end
+                        
+                        if not ocupado then
+                            table.insert(standsDisponiveis, objeto)
+                        end
+                    end
+                end
+            end
             
-            if clickDetector then
-                fireclickdetector(clickDetector)
-                statusLabel.Text = "✓ Stand ativado!"
-            elseif prompt then
-                -- Simular interação com ProximityPrompt
-                prompt:InputHoldBegin()
-                task.wait(0.5)
-                prompt:InputHoldEnd()
-                statusLabel.Text = "✓ Stand ativado!"
+            if #standsDisponiveis > 0 and menu.autoStandAtivo then
+                -- Escolher stand aleatório
+                local standEscolhido = standsDisponiveis[math.random(1, #standsDisponiveis)]
+                
+                print("🎯 Stand encontrado! Teleportando...")
+                
+                -- Teleportar
+                if standEscolhido:IsA("BasePart") then
+                    player.Character:SetPrimaryPartCFrame(standEscolhido.CFrame * CFrame.new(0, 3, 0))
+                    wait(0.5)
+                end
+                
+                -- Clicar no botão
+                if standEscolhido:IsA("TextButton") then
+                    fireclickdetector(standEscolhido)
+                else
+                    -- Tentar encontrar ClickDetector
+                    local clickDetector = standEscolhido:FindFirstChild("ClickDetector")
+                    if clickDetector then
+                        fireclickdetector(clickDetector)
+                    end
+                end
+                
+                print("✅ Stand reivindicado com sucesso!")
+                menu.autoStandAtivo = false
+                menu.procurandoStand = false
+                
+                -- Atualizar botão para OFF
+                for _, child in ipairs(menu.frameMenu:GetChildren()) do
+                    if child:IsA("Frame") and child:FindFirstChild("TextLabel") then
+                        local textoLabel = child.TextLabel
+                        if textoLabel.Text == "AUTO STAND" then
+                            local botao = child:FindFirstChild("TextButton")
+                            if botao then
+                                botao.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+                                botao.Text = "OFF"
+                                child.Frame.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+                            end
+                        end
+                    end
+                end
             else
-                statusLabel.Text = "✗ Sem detector"
+                if menu.autoStandAtivo then
+                    print("❌ Nenhum stand disponível no momento. Tentando novamente...")
+                    wait(2)
+                    encontrarStand()
+                else
+                    menu.procurandoStand = false
+                end
             end
         end
-    else
-        statusLabel.Text = "✗ Nenhum stand encontrado"
-    end
-    
-    -- Loop enquanto ativo
-    if autoStandAtivo then
-        task.wait(3) -- Esperar 3 segundos
-        encontrarEAtivarStand()
-    end
-end
-
--- Função para alternar Auto Stand
-local function alternarAutoStand()
-    autoStandAtivo = not autoStandAtivo
-    
-    if autoStandAtivo then
-        autoStandButton.BackgroundColor3 = Color3.new(0.2, 0.6, 0.2)
-        statusLabel.Text = "Auto Stand: ATIVO"
-        statusLabel.TextColor3 = Color3.new(0.3, 1, 0.3)
         
-        -- Iniciar a função
-        coroutine.wrap(function()
-            encontrarEAtivarStand()
-        end)()
+        -- Iniciar busca
+        coroutine.wrap(encontrarStand)()
     else
-        autoStandButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
-        statusLabel.Text = "Auto Stand: Desativado"
-        statusLabel.TextColor3 = Color3.new(1, 0.3, 0.3)
+        menu.procurandoStand = false
+        print("⏹️ Auto Stand desativado")
     end
 end
 
--- Conectar eventos dos botões
-toggleButton.MouseButton1Click:Connect(alternarMenu)
-autoStandButton.MouseButton1Click:Connect(alternarAutoStand)
+-- Criar botão de toggle do menu
+local botaoToggle = Instance.new("TextButton")
+botaoToggle.Name = "ToggleMenu"
+botaoToggle.Size = UDim2.new(0, 50, 0, 50)
+botaoToggle.Position = UDim2.new(0, 20, 0, 20)
+botaoToggle.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+botaoToggle.Text = "≡"
+botaoToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+botaoToggle.TextSize = 30
+botaoToggle.Font = Enum.Font.GothamBold
+botaoToggle.BorderSizePixel = 0
+botaoToggle.Parent = screenGui
 
--- Botão CLICK - executa uma vez
-clickButton.MouseButton1Click:Connect(function()
-    if autoStandAtivo then
-        -- Se auto stand estiver ativo, apenas executa uma busca manual
-        coroutine.wrap(function()
-            autoStandAtivo = false
-            alternarAutoStand() -- Desativa o auto
-            task.wait(0.1)
-            autoStandAtivo = true
-            encontrarEAtivarStand() -- Executa uma vez
-            autoStandAtivo = false
-            alternarAutoStand() -- Reativa
-        end)()
-    else
-        -- Se não estiver ativo, executa uma vez
-        coroutine.wrap(function()
-            autoStandAtivo = true
-            encontrarEAtivarStand()
-            autoStandAtivo = false
-        end)()
-    end
+-- Criar frame principal do menu
+local frameMenu = Instance.new("Frame")
+frameMenu.Name = "Menu"
+frameMenu.Size = UDim2.new(0, 200, 0, 300)
+frameMenu.Position = UDim2.new(0, 80, 0, 20)
+frameMenu.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+frameMenu.BackgroundTransparency = 0.1
+frameMenu.BorderSizePixel = 0
+frameMenu.Parent = screenGui
+menu.frameMenu = frameMenu
+
+-- Criar borda do menu
+local bordaMenu = Instance.new("Frame")
+bordaMenu.Size = UDim2.new(1, 0, 0, 2)
+bordaMenu.Position = UDim2.new(0, 0, 0, 0)
+bordaMenu.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+bordaMenu.BorderSizePixel = 0
+bordaMenu.Parent = frameMenu
+
+-- Criar título do menu
+local titulo = Instance.new("TextLabel")
+titulo.Size = UDim2.new(1, 0, 0, 40)
+titulo.Position = UDim2.new(0, 0, 0, 0)
+titulo.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+titulo.Text = "MENU PRINCIPAL"
+titulo.TextColor3 = Color3.fromRGB(255, 255, 255)
+titulo.Font = Enum.Font.GothamBold
+titulo.TextSize = 16
+titulo.BorderSizePixel = 0
+titulo.Parent = frameMenu
+
+-- Área de conteúdo
+local conteudo = Instance.new("Frame")
+conteudo.Name = "Conteudo"
+conteudo.Size = UDim2.new(1, -20, 1, -60)
+conteudo.Position = UDim2.new(0, 10, 0, 50)
+conteudo.BackgroundTransparency = 1
+conteudo.Parent = frameMenu
+
+-- Criar botões
+local yPos = 0
+
+-- Botão AUTO STAND
+criarBotaoToggle("AUTO STAND", UDim2.new(0, 0, 0, yPos), autoStandFunction)
+
+-- Função para toggle do menu
+botaoToggle.MouseButton1Click:Connect(function()
+    menu.aberto = not menu.aberto
+    frameMenu.Visible = menu.aberto
+    botaoToggle.Text = menu.aberto and "✕" or "≡"
 end)
 
--- Configuração inicial
-statusLabel.Text = "Desativado"
-statusLabel.TextColor3 = Color3.new(1, 0.3, 0.3)
-
-print("Script GUI carregado! Menu criado com sucesso.")
+print("✅ Script carregado com sucesso!")
+print("📌 Clique no botão '≡' para abrir/fechar o menu")
