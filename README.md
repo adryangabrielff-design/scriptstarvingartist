@@ -1,4 +1,4 @@
--- Script Auto Stand - VERSÃO SUPREMA
+-- Script Auto Stand - VERSÃO ESTANTE & REIVINDICAR
 local player = game.Players.LocalPlayer
 local mouse = player:GetMouse()
 local screenGui = Instance.new("ScreenGui")
@@ -8,6 +8,8 @@ screenGui.ResetOnSpawn = false
 -- Variáveis
 local menuAberto = false
 local processando = false
+local VirtualUser = game:GetService("VirtualUser")
+local VirtualInput = game:GetService("VirtualInputManager")
 
 -- BOTÃO MENU
 local toggleButton = Instance.new("TextButton")
@@ -41,8 +43,55 @@ autoStandButton.Font = Enum.Font.SourceSansBold
 autoStandButton.TextScaled = true
 autoStandButton.Parent = menuFrame
 
+-- FUNÇÃO PARA ENCONTRAR ESTANTES
+function encontrarEstantes()
+    local estantes = {}
+    local workspace = game:GetService("Workspace")
+    
+    -- Varredura COMPLETA em TODO O MAPA
+    for _, obj in pairs(workspace:GetDescendants()) do
+        -- Procura por objetos com "ESTANTE" no nome
+        if obj.Name:find("ESTANTE") or obj.Name:find("Estante") then
+            -- Procura por botão de reivindicar dentro ou perto da estante
+            local botaoReivindicar = nil
+            
+            -- Procura no próprio objeto
+            for _, child in pairs(obj:GetDescendants()) do
+                if child:IsA("TextButton") or child:IsA("ImageButton") then
+                    if child.Text:find("Reivindicar") or child.Name:find("Reivindicar") then
+                        botaoReivindicar = child
+                        break
+                    end
+                end
+            end
+            
+            -- Procura no pai do objeto
+            if not botaoReivindicar and obj.Parent then
+                for _, child in pairs(obj.Parent:GetDescendants()) do
+                    if child:IsA("TextButton") or child:IsA("ImageButton") then
+                        if child.Text:find("Reivindicar") or child.Name:find("Reivindicar") then
+                            botaoReivindicar = child
+                            break
+                        end
+                    end
+                end
+            end
+            
+            -- Se encontrou o botão, adiciona à lista
+            if botaoReivindicar then
+                table.insert(estantes, {
+                    estante = obj,
+                    botao = botaoReivindicar
+                })
+            end
+        end
+    end
+    
+    return estantes
+end
+
 -- FUNÇÃO DE TELEPORTE ABSOLUTO
-function teleportarAbsoluto(stand)
+function teleportarParaEstante(estante)
     local character = player.Character
     if not character then
         character = player.CharacterAdded:Wait()
@@ -54,93 +103,78 @@ function teleportarAbsoluto(stand)
         repeat wait() root = character:FindFirstChild("HumanoidRootPart") until root
     end
     
-    -- TELEPORTE RADICAL - 10x seguidas
-    for i = 1, 10 do
-        root.CFrame = stand.CFrame + Vector3.new(0, 5, 0)
+    -- Posiciona na frente da estante
+    local posicaoEstante = estante.Position
+    local direcaoFrente = estante.CFrame.LookVector
+    
+    -- TELEPORTE MASSIVO - 20x seguidas
+    for i = 1, 20 do
+        -- Teleporta para perto da estante
+        root.CFrame = CFrame.new(posicaoEstante + direcaoFrente * 3 + Vector3.new(0, 2, 0))
         root.Velocity = Vector3.new(0, 0, 0)
         root.RotVelocity = Vector3.new(0, 0, 0)
         wait()
     end
 end
 
--- FUNÇÃO DE CLIQUE ABSOLUTO
-function clicarAbsoluto(stand, detector)
-    -- MÉTODO 1: FireClickDetector MÚLTIPLO
-    for i = 1, 15 do
-        pcall(function()
-            fireclickdetector(detector)
-        end)
-        wait(0.01)
-    end
-    
-    -- MÉTODO 2: MouseClick
+-- FUNÇÃO PARA CLICAR NO BOTÃO REIVINDICAR
+function clicarBotaoReivindicar(botao)
+    -- MÉTODO 1: Clique direto no botão GUI
     pcall(function()
-        detector.MouseClick:Fire()
-    end)
-    
-    -- MÉTODO 3: Clique na tela
-    pcall(function()
-        local standPos = stand.Position
-        local cam = workspace.CurrentCamera
-        local screenPos = cam:WorldToViewportPoint(standPos)
-        
-        -- Simular clique do mouse REAL
-        mouse1press()
-        wait(0.05)
-        mouse1release()
-        
-        -- Clicar na posição do stand
-        if screenPos.Z > 0 then
-            local virtual = game:GetService("VirtualInputManager")
-            virtual:SendMouseButtonEvent(screenPos.X, screenPos.Y, 0, true, nil, 0)
-            wait(0.05)
-            virtual:SendMouseButtonEvent(screenPos.X, screenPos.Y, 0, false, nil, 0)
+        if botao:IsA("TextButton") or botao:IsA("ImageButton") then
+            -- Simular clique no botão
+            botao.MouseButton1Click:Fire()
+            botao.MouseButton1Down:Fire()
+            botao.MouseButton1Up:Fire()
+            
+            -- Ativar o botão
+            botao.Activated:Fire()
         end
     end)
     
-    -- MÉTODO 4: MAIS CLICK DETECTOR
-    for i = 1, 20 do
-        pcall(function()
-            fireclickdetector(detector)
-        end)
-        wait()
-    end
-end
-
--- FUNÇÃO PARA ENCONTRAR STAND
-function encontrarStand()
-    local workspace = game:GetService("Workspace")
-    local stands = {}
+    wait(0.1)
     
-    -- Varredura COMPLETA
-    for _, obj in pairs(workspace:GetDescendants()) do
-        if obj:IsA("BasePart") and obj.Name == "Stand" then
-            local detector = obj:FindFirstChildOfClass("ClickDetector")
-            if detector then
-                -- Verificar se está ocupado
-                local ocupado = false
-                local parent = obj.Parent
-                
-                if parent then
-                    for _, child in pairs(parent:GetDescendants()) do
-                        if child:IsA("TextLabel") or child:IsA("BillboardGui") then
-                            local texto = child.Text or ""
-                            if texto:find("JARRA") or texto:find("Artista") then
-                                ocupado = true
-                                break
-                            end
-                        end
-                    end
-                end
-                
-                if not ocupado then
-                    table.insert(stands, {obj, detector})
-                end
+    -- MÉTODO 2: Clicar na posição do botão na tela
+    pcall(function()
+        local absPos = botao.AbsolutePosition
+        local absSize = botao.AbsoluteSize
+        local centerX = absPos.X + (absSize.X / 2)
+        local centerY = absPos.Y + (absSize.Y / 2)
+        
+        -- Mover mouse para o botão
+        VirtualInput:SendMouseMoveEvent(centerX, centerY)
+        wait(0.1)
+        
+        -- Clicar 10x seguidas
+        for i = 1, 10 do
+            VirtualInput:SendMouseButtonEvent(centerX, centerY, 0, true, nil, 0)
+            wait(0.02)
+            VirtualInput:SendMouseButtonEvent(centerX, centerY, 0, false, nil, 0)
+            wait(0.02)
+        end
+    end)
+    
+    wait(0.1)
+    
+    -- MÉTODO 3: Clique via VirtualUser
+    pcall(function()
+        VirtualUser:ClickButton1(Vector2.new(botao.AbsolutePosition.X + 10, botao.AbsolutePosition.Y + 10))
+    end)
+    
+    wait(0.1)
+    
+    -- MÉTODO 4: Fire os eventos novamente
+    for i = 1, 5 do
+        pcall(function()
+            if botao:IsA("TextButton") then
+                fireclickdetector(botao)
+            else
+                botao.MouseButton1Click:Fire()
+                botao.Activated:Fire()
             end
-        end
+        end)
+        wait(0.05)
     end
-    
-    return stands
 end
 
 -- FUNÇÃO PRINCIPAL
@@ -153,45 +187,50 @@ function autoStand()
     
     wait(0.3)
     
-    local stands = encontrarStand()
+    local estantes = encontrarEstantes()
     
-    if #stands > 0 then
-        -- ESCOLHER ALEATÓRIO
-        local index = math.random(1, #stands)
-        local stand = stands[index][1]
-        local detector = stands[index][2]
+    if #estantes > 0 then
+        -- ESCOLHER UMA ESTANTE ALEATÓRIA
+        local index = math.random(1, #estantes)
+        local estanteEscolhida = estantes[index].estante
+        local botaoEscolhido = estantes[index].botao
         
         autoStandButton.Text = "TELEPORTANDO..."
         wait(0.2)
         
-        -- TELEPORTAR
-        teleportarAbsoluto(stand)
+        -- TELEPORTAR PARA ESTANTE
+        teleportarParaEstante(estanteEscolhida)
+        
+        wait(0.5)
+        
+        autoStandButton.Text = "REIVINDICANDO..."
+        autoStandButton.BackgroundColor3 = Color3.new(1, 1, 0)
+        
+        -- CLICAR NO BOTÃO REIVINDICAR
+        clicarBotaoReivindicar(botaoEscolhido)
         
         wait(0.3)
         
-        autoStandButton.Text = "CLICANDO..."
-        
-        -- CLICAR
-        clicarAbsoluto(stand, detector)
-        
-        wait(0.2)
-        
         -- MAIS CLIQUES PARA GARANTIR
-        for i = 1, 10 do
+        for i = 1, 15 do
             pcall(function()
-                fireclickdetector(detector)
+                if botaoEscolhido:IsA("TextButton") then
+                    botaoEscolhido.MouseButton1Click:Fire()
+                else
+                    fireclickdetector(botaoEscolhido)
+                end
             end)
             wait(0.02)
         end
         
-        autoStandButton.Text = "FEITO!"
+        autoStandButton.Text = "CONCLUÍDO!"
         autoStandButton.BackgroundColor3 = Color3.new(0, 1, 0)
         
-        wait(1.5)
+        wait(2)
     else
-        autoStandButton.Text = "SEM STANDS"
+        autoStandButton.Text = "SEM ESTANTES"
         autoStandButton.BackgroundColor3 = Color3.new(0.5, 0, 0)
-        wait(1.5)
+        wait(2)
     end
     
     autoStandButton.Text = "AUTO STAND"
@@ -209,7 +248,7 @@ end)
 
 autoStandButton.MouseButton1Click:Connect(autoStand)
 
--- Tecla E
+-- Tecla E para abrir/fechar menu
 mouse.KeyDown:Connect(function(key)
     if key:lower() == "e" then
         menuAberto = not menuAberto
