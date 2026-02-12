@@ -194,7 +194,3 @@ mouse.KeyDown:Connect(function(key)
         toggleButton.BackgroundColor3 = menuAberto and Color3.new(0.1, 0.5, 0.1) or Color3.new(0.2, 0.2, 0.2)
     end
 end)
-
-print("✅ Script de Auto Stand carregado com sucesso!")
-print("📌 Clique no botão MENU ou pressione E para abrir/fechar")
-print("🎯 Clique em AUTO STAND para encontrar e reivindicar um stand automaticamente")
