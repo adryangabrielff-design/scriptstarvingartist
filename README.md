@@ -1,73 +1,80 @@
 local player = game.Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
--- Criar ScreenGui
+-- Criar GUI
 local gui = Instance.new("ScreenGui")
-gui.Name = "StandMenu"
+gui.Name = "SimpleMenu"
+gui.ResetOnSpawn = false
 gui.Parent = playerGui
 
--- Botão abrir/fechar menu
-local toggleButton = Instance.new("TextButton")
-toggleButton.Size = UDim2.new(0,120,0,40)
-toggleButton.Position = UDim2.new(0,10,0,10)
-toggleButton.Text = "Menu"
-toggleButton.Parent = gui
+-- Botão abrir / fechar menu
+local openCloseButton = Instance.new("TextButton")
+openCloseButton.Size = UDim2.new(0,120,0,40)
+openCloseButton.Position = UDim2.new(0,10,0,10)
+openCloseButton.Text = "Abrir Menu"
+openCloseButton.Parent = gui
 
 -- Frame do menu
 local menuFrame = Instance.new("Frame")
-menuFrame.Size = UDim2.new(0,200,0,150)
+menuFrame.Size = UDim2.new(0,220,0,160)
 menuFrame.Position = UDim2.new(0,10,0,60)
-menuFrame.BackgroundColor3 = Color3.fromRGB(40,40,40)
+menuFrame.BackgroundColor3 = Color3.fromRGB(35,35,35)
 menuFrame.Visible = true
 menuFrame.Parent = gui
 
--- Botão Auto Stand
+-- Estado menu
+local menuOpen = true
+
+openCloseButton.MouseButton1Click:Connect(function()
+	menuOpen = not menuOpen
+	menuFrame.Visible = menuOpen
+	
+	if menuOpen then
+		openCloseButton.Text = "Fechar Menu"
+	else
+		openCloseButton.Text = "Abrir Menu"
+	end
+end)
+
+-------------------------------------------------
+-- BOTÃO AUTO STAND (estrutura pronta)
+-------------------------------------------------
+
 local autoStandButton = Instance.new("TextButton")
-autoStandButton.Size = UDim2.new(0,180,0,40)
+autoStandButton.Size = UDim2.new(0,200,0,45)
 autoStandButton.Position = UDim2.new(0,10,0,10)
 autoStandButton.Text = "Auto Stand: OFF"
 autoStandButton.Parent = menuFrame
 
-local autoStandOn = false
+local autoStandEnabled = false
 
 autoStandButton.MouseButton1Click:Connect(function()
-	autoStandOn = not autoStandOn
+	autoStandEnabled = not autoStandEnabled
 	
-	if autoStandOn then
+	if autoStandEnabled then
 		autoStandButton.Text = "Auto Stand: ON"
 	else
 		autoStandButton.Text = "Auto Stand: OFF"
 	end
 end)
 
--- Toggle menu abrir/fechar
-toggleButton.MouseButton1Click:Connect(function()
-	menuFrame.Visible = not menuFrame.Visible
-end)
+-------------------------------------------------
+-- LOOP BASE DA FUNÇÃO
+-------------------------------------------------
 
--- Função Auto Stand
 task.spawn(function()
 	while true do
-		if autoStandOn then
+		
+		if autoStandEnabled then
+			-- Coloque aqui sua lógica oficial do jogo
+			-- Exemplo:
+			-- chamar RemoteEvent
+			-- chamar função do servidor
+			-- usar sistema interno do seu place
 			
-			local stands = {}
-
-			for _, obj in pairs(workspace:GetDescendants()) do
-				if obj.Name == "Stand" and obj:IsA("BasePart") then
-					table.insert(stands, obj)
-				end
-			end
-
-			if #stands > 0 then
-				local randomStand = stands[math.random(1,#stands)]
-				
-				local character = player.Character
-				if character and character:FindFirstChild("HumanoidRootPart") then
-					character.HumanoidRootPart.CFrame = randomStand.CFrame + Vector3.new(0,3,0)
-				end
-			end
+			print("Auto Stand ativo")
 		end
 		
-		task.wait(3)
+		task.wait(2)
 	end
 end)
