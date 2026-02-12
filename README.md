@@ -1,73 +1,123 @@
-local player = game.Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
+import pyautogui
+import time
+import virtualkeystroke as vkey
+import keyboard
+import win32api, win32con
+from PIL import Image
+from tqdm import tqdm
 
--- Criar ScreenGui
-local gui = Instance.new("ScreenGui")
-gui.Name = "StandMenu"
-gui.Parent = playerGui
 
--- Botão abrir/fechar menu
-local toggleButton = Instance.new("TextButton")
-toggleButton.Size = UDim2.new(0,120,0,40)
-toggleButton.Position = UDim2.new(0,10,0,10)
-toggleButton.Text = "Menu"
-toggleButton.Parent = gui
+# Function to simulate a mouse click at given coordinates
+def click(x, y):
+	win32api.SetCursorPos((x, y))
+	win32api.mouse_event(win32con.MOUSEEVENTF_MOVE, 1, 1, 0, 0)
+	win32api.mouse_event(win32con.MOUSEEVENTF_MOVE, -1, -1, 0, 0)
+	win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, x, y, 0, 0)
+	win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, x, y, 0, 0)
+	time.sleep(.01)
 
--- Frame do menu
-local menuFrame = Instance.new("Frame")
-menuFrame.Size = UDim2.new(0,200,0,150)
-menuFrame.Position = UDim2.new(0,10,0,60)
-menuFrame.BackgroundColor3 = Color3.fromRGB(40,40,40)
-menuFrame.Visible = true
-menuFrame.Parent = gui
 
--- Botão Auto Stand
-local autoStandButton = Instance.new("TextButton")
-autoStandButton.Size = UDim2.new(0,180,0,40)
-autoStandButton.Position = UDim2.new(0,10,0,10)
-autoStandButton.Text = "Auto Stand: OFF"
-autoStandButton.Parent = menuFrame
+# Define coordinates for various actions
+firstX, firstY = 664, 175
+lastX, lastY = 1254, 765
+openButtonX, openButtonY = 1084, 822
+inputX, inputY = 1081, 740
+closeButtonX, closeButtonY = 1319, 538
 
-local autoStandOn = false
+diffX = lastX - firstX
+diffY = lastY - firstY
+stepX = diffX / 31
+stepY = diffY / 31
+step = (stepX + stepY) / 2
 
-autoStandButton.MouseButton1Click:Connect(function()
-	autoStandOn = not autoStandOn
-	
-	if autoStandOn then
-		autoStandButton.Text = "Auto Stand: ON"
-	else
-		autoStandButton.Text = "Auto Stand: OFF"
-	end
-end)
+pixels = {}
 
--- Toggle menu abrir/fechar
-toggleButton.MouseButton1Click:Connect(function()
-	menuFrame.Visible = not menuFrame.Visible
-end)
+# Load the image and process its pixels
+imageName = input("Image name:")
+image = Image.open(imageName)
+if image.size[0] != 32 or image.size[1] != 32:
+	print("Resizing image")
+	image = image.resize((32, 32), resample=Image.BOX)
+	image.save(imageName, quality=100)
+imagePixels = image.load()
+for x in range(32):
+	for y in range(32):
+		try:
+			pixels[imagePixels[x, y]].append([x, y])
+		except KeyError:
+			pixels[imagePixels[x, y]] = [[x, y]]
+image.close()
 
--- Função Auto Stand
-task.spawn(function()
-	while true do
-		if autoStandOn then
-			
-			local stands = {}
 
-			for _, obj in pairs(workspace:GetDescendants()) do
-				if obj.Name == "Stand" and obj:IsA("BasePart") then
-					table.insert(stands, obj)
-				end
-			end
+# Function to convert RGB to HEX
+def rgb2hex(pixel):
+	return '{:02x}{:02x}{:02x}'.format(pixel[0], pixel[1], pixel[2])
 
-			if #stands > 0 then
-				local randomStand = stands[math.random(1,#stands)]
-				
-				local character = player.Character
-				if character and character:FindFirstChild("HumanoidRootPart") then
-					character.HumanoidRootPart.CFrame = randomStand.CFrame + Vector3.new(0,3,0)
-				end
-			end
-		end
-		
-		task.wait(3)
-	end
-end)
+
+# Function to simulate a mouse click on a pixel
+def clickPixel(clickX, clickY):
+	click(clickX, clickY)
+
+
+# Function to quickly simulate a mouse click on a pixel
+def clickFastPixel(addX, addY):
+	clickX = round(firstX + addX * stepX)
+	clickY = round(firstY + addY * stepY)
+	clickPixel(clickX, clickY)
+
+
+# Function to check and click a pixel with a specific color
+def clickCheckPixel(addX, addY, color, s):
+	clickX = round(firstX + addX * stepX)
+	clickY = round(firstY + addY * stepY)
+	pixelColor = s.getpixel((clickX, clickY))
+	if pixelColor[0:3] == color[0:3]:
+		return False
+	selectColor(color)
+	clickPixel(clickX, clickY)
+	# print(f"{pixelColor[0:3]} -> {color[0:3]}")
+	return True
+
+
+# Function to select a color in the game
+def selectColor(color):
+	hexColor = rgb2hex(color)
+	click(openButtonX, openButtonY)
+	time.sleep(.01)
+	click(inputX, inputY)
+	time.sleep(.01)
+	vkey.typer(string=hexColor)
+	time.sleep(.01)
+	click(closeButtonX, closeButtonY)
+
+
+# Main execution
+inputVar = input("Use FastPixel? ")
+
+click(closeButtonX, closeButtonY)
+click(closeButtonX, closeButtonY)
+
+time.sleep(0.1)
+
+if inputVar == "y":
+	for color in tqdm(pixels):
+		selectColor(color)
+		for pixel in pixels[color]:
+			clickFastPixel(pixel[0], pixel[1])
+			if keyboard.is_pressed('q'):
+				quit()
+
+while keyboard.is_pressed('q') == False:
+	s = pyautogui.screenshot()
+	changedPixel = False
+	time.sleep(0.1)
+	for color in tqdm(pixels):
+		for pixel in pixels[color]:
+			if clickCheckPixel(pixel[0], pixel[1], color, s):
+				changedPixel = True
+			if keyboard.is_pressed('q'):
+				quit()
+	if not changedPixel:
+		break
+	click(closeButtonX, closeButtonY)
+	time.sleep(0.1)
