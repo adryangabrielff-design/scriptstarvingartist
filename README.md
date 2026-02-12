@@ -1,123 +1,256 @@
-import pyautogui
-import time
-import virtualkeystroke as vkey
-import keyboard
-import win32api, win32con
-from PIL import Image
-from tqdm import tqdm
+--[[
+    Script GUI Simples - Auto Stand
+    Fácil de expandir e modificar
+]]
 
+local player = game.Players.LocalPlayer
+local mouse = player:GetMouse()
+local guiService = game:GetService("GuiService")
+local tweenService = game:GetService("TweenService")
 
-# Function to simulate a mouse click at given coordinates
-def click(x, y):
-	win32api.SetCursorPos((x, y))
-	win32api.mouse_event(win32con.MOUSEEVENTF_MOVE, 1, 1, 0, 0)
-	win32api.mouse_event(win32con.MOUSEEVENTF_MOVE, -1, -1, 0, 0)
-	win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, x, y, 0, 0)
-	win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, x, y, 0, 0)
-	time.sleep(.01)
+-- Variáveis de estado
+local menuAberto = false
+local autoStandAtivo = false
 
+-- Criar ScreenGui principal
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "MenuPrincipal"
+screenGui.Parent = player.PlayerGui
+screenGui.ResetOnSpawn = false
 
-# Define coordinates for various actions
-firstX, firstY = 664, 175
-lastX, lastY = 1254, 765
-openButtonX, openButtonY = 1084, 822
-inputX, inputY = 1081, 740
-closeButtonX, closeButtonY = 1319, 538
+-- Criar botão toggle do menu (sempre visível)
+local toggleButton = Instance.new("TextButton")
+toggleButton.Name = "ToggleMenu"
+toggleButton.Size = UDim2.new(0, 50, 0, 50)
+toggleButton.Position = UDim2.new(0, 20, 0, 20)
+toggleButton.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+toggleButton.BackgroundTransparency = 0.2
+toggleButton.BorderSizePixel = 0
+toggleButton.Text = "≡"
+toggleButton.TextColor3 = Color3.new(1, 1, 1)
+toggleButton.TextScaled = true
+toggleButton.Font = Enum.Font.SourceSansBold
+toggleButton.Parent = screenGui
 
-diffX = lastX - firstX
-diffY = lastY - firstY
-stepX = diffX / 31
-stepY = diffY / 31
-step = (stepX + stepY) / 2
+-- Arredondar bordas do toggle
+local toggleCorner = Instance.new("UICorner")
+toggleCorner.CornerRadius = UDim.new(0, 8)
+toggleCorner.Parent = toggleButton
 
-pixels = {}
+-- Criar frame do menu (invisível inicialmente)
+local menuFrame = Instance.new("Frame")
+menuFrame.Name = "MenuFrame"
+menuFrame.Size = UDim2.new(0, 250, 0, 180)
+menuFrame.Position = UDim2.new(0, 80, 0, 20)
+menuFrame.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15)
+menuFrame.BackgroundTransparency = 0.1
+menuFrame.BorderSizePixel = 0
+menuFrame.Visible = false
+menuFrame.Parent = screenGui
 
-# Load the image and process its pixels
-imageName = input("Image name:")
-image = Image.open(imageName)
-if image.size[0] != 32 or image.size[1] != 32:
-	print("Resizing image")
-	image = image.resize((32, 32), resample=Image.BOX)
-	image.save(imageName, quality=100)
-imagePixels = image.load()
-for x in range(32):
-	for y in range(32):
-		try:
-			pixels[imagePixels[x, y]].append([x, y])
-		except KeyError:
-			pixels[imagePixels[x, y]] = [[x, y]]
-image.close()
+-- Arredondar bordas do menu
+local menuCorner = Instance.new("UICorner")
+menuCorner.CornerRadius = UDim.new(0, 12)
+menuCorner.Parent = menuFrame
 
+-- Adicionar título ao menu
+local menuTitle = Instance.new("TextLabel")
+menuTitle.Name = "Title"
+menuTitle.Size = UDim2.new(1, 0, 0, 40)
+menuTitle.Position = UDim2.new(0, 0, 0, 0)
+menuTitle.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+menuTitle.BackgroundTransparency = 0.3
+menuTitle.BorderSizePixel = 0
+menuTitle.Text = "MENU PRINCIPAL"
+menuTitle.TextColor3 = Color3.new(1, 1, 1)
+menuTitle.TextScaled = true
+menuTitle.Font = Enum.Font.SourceSansBold
+menuTitle.Parent = menuFrame
 
-# Function to convert RGB to HEX
-def rgb2hex(pixel):
-	return '{:02x}{:02x}{:02x}'.format(pixel[0], pixel[1], pixel[2])
+-- Arredondar topo do título
+local titleCorner = Instance.new("UICorner")
+titleCorner.CornerRadius = UDim.new(0, 12)
+titleCorner.Parent = menuTitle
 
+-- Criar container para os botões
+local buttonContainer = Instance.new("Frame")
+buttonContainer.Name = "ButtonContainer"
+buttonContainer.Size = UDim2.new(1, -20, 1, -50)
+buttonContainer.Position = UDim2.new(0, 10, 0, 45)
+buttonContainer.BackgroundTransparency = 1
+buttonContainer.Parent = menuFrame
 
-# Function to simulate a mouse click on a pixel
-def clickPixel(clickX, clickY):
-	click(clickX, clickY)
+-- Criar botão Auto Stand
+local autoStandButton = Instance.new("TextButton")
+autoStandButton.Name = "AutoStand"
+autoStandButton.Size = UDim2.new(1, 0, 0, 40)
+autoStandButton.Position = UDim2.new(0, 0, 0, 0)
+autoStandButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+autoStandButton.BorderSizePixel = 0
+autoStandButton.Text = "AUTO STAND"
+autoStandButton.TextColor3 = Color3.new(1, 1, 1)
+autoStandButton.TextScaled = true
+autoStandButton.Font = Enum.Font.SourceSans
+autoStandButton.Parent = buttonContainer
 
+local autoStandCorner = Instance.new("UICorner")
+autoStandCorner.CornerRadius = UDim.new(0, 8)
+autoStandCorner.Parent = autoStandButton
 
-# Function to quickly simulate a mouse click on a pixel
-def clickFastPixel(addX, addY):
-	clickX = round(firstX + addX * stepX)
-	clickY = round(firstY + addY * stepY)
-	clickPixel(clickX, clickY)
+-- Criar botão CLICK
+local clickButton = Instance.new("TextButton")
+clickButton.Name = "Click"
+clickButton.Size = UDim2.new(0.8, 0, 0, 40)
+clickButton.Position = UDim2.new(0.1, 0, 0, 50)
+clickButton.BackgroundColor3 = Color3.new(0.2, 0.6, 0.2)
+clickButton.BorderSizePixel = 0
+clickButton.Text = "CLICK"
+clickButton.TextColor3 = Color3.new(1, 1, 1)
+clickButton.TextScaled = true
+clickButton.Font = Enum.Font.SourceSansBold
+clickButton.Parent = buttonContainer
 
+local clickCorner = Instance.new("UICorner")
+clickCorner.CornerRadius = UDim.new(0, 8)
+clickCorner.Parent = clickButton
 
-# Function to check and click a pixel with a specific color
-def clickCheckPixel(addX, addY, color, s):
-	clickX = round(firstX + addX * stepX)
-	clickY = round(firstY + addY * stepY)
-	pixelColor = s.getpixel((clickX, clickY))
-	if pixelColor[0:3] == color[0:3]:
-		return False
-	selectColor(color)
-	clickPixel(clickX, clickY)
-	# print(f"{pixelColor[0:3]} -> {color[0:3]}")
-	return True
+-- Adicionar status label
+local statusLabel = Instance.new("TextLabel")
+statusLabel.Name = "Status"
+statusLabel.Size = UDim2.new(1, 0, 0, 30)
+statusLabel.Position = UDim2.new(0, 0, 0, 100)
+statusLabel.BackgroundTransparency = 1
+statusLabel.Text = "Desativado"
+statusLabel.TextColor3 = Color3.new(1, 0.3, 0.3)
+statusLabel.TextScaled = true
+statusLabel.Font = Enum.Font.SourceSans
+statusLabel.Parent = buttonContainer
 
+-- Função para alternar menu
+local function alternarMenu()
+    menuAberto = not menuAberto
+    menuFrame.Visible = menuAberto
+    
+    -- Animação simples do botão toggle
+    if menuAberto then
+        toggleButton.Text = "✕"
+        toggleButton.BackgroundColor3 = Color3.new(0.4, 0.2, 0.2)
+    else
+        toggleButton.Text = "≡"
+        toggleButton.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+    end
+end
 
-# Function to select a color in the game
-def selectColor(color):
-	hexColor = rgb2hex(color)
-	click(openButtonX, openButtonY)
-	time.sleep(.01)
-	click(inputX, inputY)
-	time.sleep(.01)
-	vkey.typer(string=hexColor)
-	time.sleep(.01)
-	click(closeButtonX, closeButtonY)
+-- Função para encontrar e interagir com botões Stand
+local function encontrarEAtivarStand()
+    if not autoStandAtivo then return end
+    
+    local stands = {}
+    
+    -- Procurar botões chamados "Stand" em todas as partes
+    for _, objeto in pairs(workspace:GetDescendants()) do
+        if objeto:IsA("Part") or objeto:IsA("MeshPart") or objeto:IsA("BasePart") then
+            if objeto.Name:lower():find("stand") then
+                table.insert(stands, objeto)
+            end
+        end
+        -- Procurar também em ClickDetectors e ProximityPrompts
+        if objeto:IsA("ClickDetector") and objeto.Parent and objeto.Parent.Name:lower():find("stand") then
+            table.insert(stands, objeto.Parent)
+        end
+        if objeto:IsA("ProximityPrompt") and objeto.Parent and objeto.Parent.Name:lower():find("stand") then
+            table.insert(stands, objeto.Parent)
+        end
+    end
+    
+    if #stands > 0 then
+        -- Escolher stand aleatório
+        local standEscolhido = stands[math.random(1, #stands)]
+        
+        -- Teleportar jogador
+        if standEscolhido:IsA("BasePart") then
+            player.Character:SetPrimaryPartCFrame(standEscolhido.CFrame + Vector3.new(0, 3, 0))
+            
+            -- Aguardar um pouco
+            task.wait(0.5)
+            
+            -- Tentar ativar o stand
+            local clickDetector = standEscolhido:FindFirstChildOfClass("ClickDetector")
+            local prompt = standEscolhido:FindFirstChildOfClass("ProximityPrompt")
+            
+            if clickDetector then
+                fireclickdetector(clickDetector)
+                statusLabel.Text = "✓ Stand ativado!"
+            elseif prompt then
+                -- Simular interação com ProximityPrompt
+                prompt:InputHoldBegin()
+                task.wait(0.5)
+                prompt:InputHoldEnd()
+                statusLabel.Text = "✓ Stand ativado!"
+            else
+                statusLabel.Text = "✗ Sem detector"
+            end
+        end
+    else
+        statusLabel.Text = "✗ Nenhum stand encontrado"
+    end
+    
+    -- Loop enquanto ativo
+    if autoStandAtivo then
+        task.wait(3) -- Esperar 3 segundos
+        encontrarEAtivarStand()
+    end
+end
 
+-- Função para alternar Auto Stand
+local function alternarAutoStand()
+    autoStandAtivo = not autoStandAtivo
+    
+    if autoStandAtivo then
+        autoStandButton.BackgroundColor3 = Color3.new(0.2, 0.6, 0.2)
+        statusLabel.Text = "Auto Stand: ATIVO"
+        statusLabel.TextColor3 = Color3.new(0.3, 1, 0.3)
+        
+        -- Iniciar a função
+        coroutine.wrap(function()
+            encontrarEAtivarStand()
+        end)()
+    else
+        autoStandButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+        statusLabel.Text = "Auto Stand: Desativado"
+        statusLabel.TextColor3 = Color3.new(1, 0.3, 0.3)
+    end
+end
 
-# Main execution
-inputVar = input("Use FastPixel? ")
+-- Conectar eventos dos botões
+toggleButton.MouseButton1Click:Connect(alternarMenu)
+autoStandButton.MouseButton1Click:Connect(alternarAutoStand)
 
-click(closeButtonX, closeButtonY)
-click(closeButtonX, closeButtonY)
+-- Botão CLICK - executa uma vez
+clickButton.MouseButton1Click:Connect(function()
+    if autoStandAtivo then
+        -- Se auto stand estiver ativo, apenas executa uma busca manual
+        coroutine.wrap(function()
+            autoStandAtivo = false
+            alternarAutoStand() -- Desativa o auto
+            task.wait(0.1)
+            autoStandAtivo = true
+            encontrarEAtivarStand() -- Executa uma vez
+            autoStandAtivo = false
+            alternarAutoStand() -- Reativa
+        end)()
+    else
+        -- Se não estiver ativo, executa uma vez
+        coroutine.wrap(function()
+            autoStandAtivo = true
+            encontrarEAtivarStand()
+            autoStandAtivo = false
+        end)()
+    end
+end)
 
-time.sleep(0.1)
+-- Configuração inicial
+statusLabel.Text = "Desativado"
+statusLabel.TextColor3 = Color3.new(1, 0.3, 0.3)
 
-if inputVar == "y":
-	for color in tqdm(pixels):
-		selectColor(color)
-		for pixel in pixels[color]:
-			clickFastPixel(pixel[0], pixel[1])
-			if keyboard.is_pressed('q'):
-				quit()
-
-while keyboard.is_pressed('q') == False:
-	s = pyautogui.screenshot()
-	changedPixel = False
-	time.sleep(0.1)
-	for color in tqdm(pixels):
-		for pixel in pixels[color]:
-			if clickCheckPixel(pixel[0], pixel[1], color, s):
-				changedPixel = True
-			if keyboard.is_pressed('q'):
-				quit()
-	if not changedPixel:
-		break
-	click(closeButtonX, closeButtonY)
-	time.sleep(0.1)
+print("Script GUI carregado! Menu criado com sucesso.")
