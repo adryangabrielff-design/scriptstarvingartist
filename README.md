@@ -172,7 +172,7 @@ local function autoStand()
 	-- Procurar botão Reivindicar
 	for _, obj in pairs(standEscolhido.Parent:GetDescendants()) do
 		if obj:IsA("TextButton") then
-			if string.find(string.lower(obj.Text), "reivindicar") then
+			if string.find(string.lower(obj.Text), "Reivindicar") then
 				print("🖱️ Botão Reivindicar encontrado")
 				obj:Activate()
 				break
