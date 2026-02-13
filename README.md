@@ -1,247 +1,102 @@
--- AUTO STAND MENU COMPLETO (FORÇA MÁXIMA)
-
+--// SERVIÇOS
 local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
 local VirtualInputManager = game:GetService("VirtualInputManager")
-
 local player = Players.LocalPlayer
 
--------------------------------------------------
--- VARIÁVEIS
--------------------------------------------------
-local menuAberto = false
-local autoStandAtivo = false
+--// CONFIG
+local TELEPORT_DELAY = 2
+local CLAIM_DELAY = 1
 
--------------------------------------------------
--- GUI
--------------------------------------------------
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "AutoStandMenu"
-screenGui.ResetOnSpawn = false
-screenGui.Parent = player:WaitForChild("PlayerGui")
-
--------------------------------------------------
--- BOTÃO MENU
--------------------------------------------------
-local toggleButton = Instance.new("TextButton")
-toggleButton.Size = UDim2.new(0,50,0,50)
-toggleButton.Position = UDim2.new(0,20,0,20)
-toggleButton.Text = "☰"
-toggleButton.BackgroundColor3 = Color3.fromRGB(40,40,40)
-toggleButton.TextColor3 = Color3.new(1,1,1)
-toggleButton.Parent = screenGui
-
--------------------------------------------------
--- MENU
--------------------------------------------------
-local menuFrame = Instance.new("Frame")
-menuFrame.Size = UDim2.new(0,260,0,170)
-menuFrame.Position = UDim2.new(0,90,0,20)
-menuFrame.BackgroundColor3 = Color3.fromRGB(25,25,25)
-menuFrame.Visible = false
-menuFrame.Parent = screenGui
-Instance.new("UICorner", menuFrame)
-
--------------------------------------------------
--- TITULO
--------------------------------------------------
-local menuTitle = Instance.new("TextLabel")
-menuTitle.Size = UDim2.new(1,0,0,35)
-menuTitle.BackgroundColor3 = Color3.fromRGB(45,45,45)
-menuTitle.Text = "AUTO STAND MENU"
-menuTitle.TextColor3 = Color3.new(1,1,1)
-menuTitle.Parent = menuFrame
-
--------------------------------------------------
--- BOTÃO AUTO
--------------------------------------------------
-local autoToggle = Instance.new("TextButton")
-autoToggle.Size = UDim2.new(0.8,0,0,40)
-autoToggle.Position = UDim2.new(0.1,0,0.5,0)
-autoToggle.Text = "AUTO OFF"
-autoToggle.BackgroundColor3 = Color3.fromRGB(60,60,60)
-autoToggle.TextColor3 = Color3.new(1,1,1)
-autoToggle.Parent = menuFrame
-Instance.new("UICorner", autoToggle)
-
--------------------------------------------------
--- TELEPORT FORÇA BRUTA
--------------------------------------------------
-local function forceTeleport(cf)
-
-	local char = player.Character or player.CharacterAdded:Wait()
-	local root = char:WaitForChild("HumanoidRootPart")
-
-	for i = 1,120 do
-		root.CFrame = cf + Vector3.new(0,6,0)
-		RunService.Heartbeat:Wait()
-	end
-
-end
-
--------------------------------------------------
--- PEGAR POSIÇÃO QUALQUER DE MODEL
--------------------------------------------------
-local function getModelPosition(model)
-
-	if model.PrimaryPart then
-		return model.PrimaryPart.CFrame
-	end
-
-	local cf,size = model:GetBoundingBox()
-	return cf
-
-end
-
--------------------------------------------------
--- ACHAR STANDS
--------------------------------------------------
+--// FUNÇÃO: PEGAR STANDS
 local function getStands()
+    local standsFolder = workspace:FindFirstChild("Stands") or workspace
+    local stands = {}
 
-	local lista = {}
+    for _, v in pairs(standsFolder:GetChildren()) do
+        if v:IsA("Model") then
+            table.insert(stands, v)
+        end
+    end
 
-	for _, obj in pairs(workspace:GetDescendants()) do
-
-		if obj:IsA("Model") then
-
-			local temTexto = false
-
-			for _, d in pairs(obj:GetDescendants()) do
-
-				if d:IsA("TextLabel") or d:IsA("TextButton") then
-
-					local t = string.upper(d.Text or "")
-
-					if t:find("UNCLAIMED") or t:find("YOUR TEXT HERE") then
-						temTexto = true
-						break
-					end
-
-				end
-
-			end
-
-			if temTexto then
-				table.insert(lista,obj)
-			end
-
-		end
-
-	end
-
-	return lista
+    return stands
 end
 
--------------------------------------------------
--- CLICK GUI REIVINDICAR
--------------------------------------------------
-local function clickReivindicarGUI()
+--// FUNÇÃO: TELEPORTAR FORÇADO
+local function forceTeleport()
+    local character = player.Character or player.CharacterAdded:Wait()
+    local hrp = character:WaitForChild("HumanoidRootPart")
 
-	for _, gui in pairs(player.PlayerGui:GetDescendants()) do
+    local stands = getStands()
+    if #stands == 0 then return end
 
-		if gui:IsA("TextButton") then
+    local stand = stands[math.random(1, #stands)]
 
-			local t = string.upper(gui.Text or "")
+    -- Procura peça para teleportar
+    local part = stand:FindFirstChildWhichIsA("BasePart", true)
 
-			if t:find("REIVINDICAR") then
-
-				local pos = gui.AbsolutePosition
-				local size = gui.AbsoluteSize
-
-				local x = pos.X + size.X/2
-				local y = pos.Y + size.Y/2
-
-				VirtualInputManager:SendMouseButtonEvent(x,y,0,true,game,0)
-				VirtualInputManager:SendMouseButtonEvent(x,y,0,false,game,0)
-
-			end
-
-		end
-
-	end
-
+    if part then
+        hrp.CFrame = part.CFrame + Vector3.new(0,5,0)
+    end
 end
 
--------------------------------------------------
--- CLICK CLICKDETECTOR
--------------------------------------------------
-local function spamClickDetector()
-
-	for _, v in pairs(workspace:GetDescendants()) do
-		if v:IsA("ClickDetector") then
-			pcall(function()
-				fireclickdetector(v)
-			end)
-		end
-	end
-
+--// FUNÇÃO: CLICK DETECTOR FORÇADO
+local function forceClickDetector()
+    for _, v in pairs(workspace:GetDescendants()) do
+        if v:IsA("ClickDetector") then
+            fireclickdetector(v)
+            return true
+        end
+    end
+    return false
 end
 
--------------------------------------------------
--- LOOP AUTO FORÇA MÁXIMA
--------------------------------------------------
-task.spawn(function()
+--// FUNÇÃO: CLICAR GUI REIVINDICAR
+local function clickClaimGUI()
+    local pg = player:FindFirstChild("PlayerGui")
+    if not pg then return false end
 
-	while true do
-		task.wait(1)
+    for _, gui in pairs(pg:GetDescendants()) do
+        if gui:IsA("TextButton") or gui:IsA("ImageButton") then
+            local txt = string.lower(gui.Text or "")
+            if string.find(txt,"reivind") then
+                gui:Activate()
+                gui.MouseButton1Click:Fire()
+                return true
+            end
+        end
+    end
 
-		if autoStandAtivo then
+    return false
+end
 
-			local stands = getStands()
+--// FUNÇÃO: SIMULAR TECLA E
+local function pressE()
+    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+    task.wait(0.1)
+    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+end
 
-			if #stands > 0 then
+--// FUNÇÃO: AUTO CLAIM MAX FORCE
+local function autoClaim()
+    task.wait(CLAIM_DELAY)
 
-				local escolhido = stands[math.random(1,#stands)]
+    -- 1 tentativa GUI
+    if clickClaimGUI() then return end
 
-				local pos = getModelPosition(escolhido)
+    -- 2 tentativa ClickDetector
+    if forceClickDetector() then return end
 
-				forceTeleport(pos)
+    -- 3 tentativa tecla E
+    pressE()
+end
 
-				task.wait(0.5)
+--// LOOP PRINCIPAL
+while true do
+    pcall(function()
+        forceTeleport()
+        task.wait(1)
+        autoClaim()
+    end)
 
-				for i = 1,10 do
-					spamClickDetector()
-					clickReivindicarGUI()
-					task.wait(0.2)
-				end
-
-			end
-
-		end
-
-	end
-
-end)
-
--------------------------------------------------
--- TOGGLE
--------------------------------------------------
-autoToggle.MouseButton1Click:Connect(function()
-
-	autoStandAtivo = not autoStandAtivo
-
-	if autoStandAtivo then
-		autoToggle.Text = "AUTO ON"
-		autoToggle.BackgroundColor3 = Color3.fromRGB(0,150,0)
-	else
-		autoToggle.Text = "AUTO OFF"
-		autoToggle.BackgroundColor3 = Color3.fromRGB(60,60,60)
-	end
-
-end)
-
--------------------------------------------------
--- MENU
--------------------------------------------------
-toggleButton.MouseButton1Click:Connect(function()
-	menuAberto = not menuAberto
-	menuFrame.Visible = menuAberto
-end)
-
-UserInputService.InputBegan:Connect(function(input,gp)
-	if not gp and input.KeyCode == Enum.KeyCode.F then
-		menuAberto = not menuAberto
-		menuFrame.Visible = menuAberto
-	end
-end)
+    task.wait(TELEPORT_DELAY)
+end
