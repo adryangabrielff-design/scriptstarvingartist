@@ -225,58 +225,115 @@ local TEXT = {
 -------------------------------------------------
 -- LANGUAGE SELECT GUI
 -------------------------------------------------
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local languageSelected = nil
+
 local langGui = Instance.new("ScreenGui")
-langGui.Parent = PlayerGui
+langGui.Name = "LanguageSelect"
+langGui.Parent = player.PlayerGui
 langGui.ResetOnSpawn = false
 
--- BACKGROUND
-local bg = Instance.new("Frame")
-bg.Size = UDim2.new(1,0,1,0)
-bg.BackgroundColor3 = Color3.fromRGB(0,0,0)
-bg.Parent = langGui
+-------------------------------------------------
+-- FRAME CENTRAL MENOR
+-------------------------------------------------
 
--- TITLE USA/BR
+local langFrame = Instance.new("Frame")
+langFrame.Size = UDim2.new(0,400,0,260) -- MENOR
+langFrame.Position = UDim2.new(0.5,-200,0.5,-130) -- CENTRAL
+langFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
+langFrame.BackgroundTransparency = 0.25
+langFrame.Parent = langGui
+
+local stroke = Instance.new("UIStroke")
+stroke.Color = Color3.fromRGB(170,0,255)
+stroke.Thickness = 3
+stroke.Parent = langFrame
+
+Instance.new("UICorner", langFrame)
+
+-------------------------------------------------
+-- TITULO
+-------------------------------------------------
+
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(0,300,0,60)
-title.Position = UDim2.new(0.5,-150,0,40)
+title.Size = UDim2.new(1,0,0,40)
+title.Position = UDim2.new(0,0,0,5)
 title.BackgroundTransparency = 1
 title.Text = "USA / BR"
-title.TextColor3 = Color3.fromRGB(255,255,255)
 title.TextScaled = true
-title.Font = Enum.Font.GothamBold
-title.Parent = bg
+title.TextColor3 = Color3.fromRGB(255,255,255)
+title.Parent = langFrame
 
--- USA BUTTON
-local usaBtn = Instance.new("ImageButton")
-usaBtn.Size = UDim2.new(0,200,0,120)
-usaBtn.Position = UDim2.new(0.25,-100,0.5,-60)
-usaBtn.Image = "rbxassetid://16047725674"
-usaBtn.Parent = bg
+-------------------------------------------------
+-- FUNÇÃO CRIAR BANDEIRA
+-------------------------------------------------
 
-local usaTxt = Instance.new("TextLabel")
-usaTxt.Size = UDim2.new(1,0,0,30)
-usaTxt.Position = UDim2.new(0,0,1,5)
-usaTxt.BackgroundTransparency = 1
-usaTxt.Text = "ENGLISH"
-usaTxt.TextColor3 = Color3.fromRGB(255,255,255)
-usaTxt.TextScaled = true
-usaTxt.Parent = usaBtn
+local function createFlag(name, imageId, posX, textBelow)
 
--- BR BUTTON
-local brBtn = Instance.new("ImageButton")
-brBtn.Size = UDim2.new(0,200,0,120)
-brBtn.Position = UDim2.new(0.75,-100,0.5,-60)
-brBtn.Image = "rbxassetid://16047725919"
-brBtn.Parent = bg
+	local flag = Instance.new("ImageButton")
+	flag.Name = name
+	flag.Size = UDim2.new(0,140,0,90)
+	flag.Position = UDim2.new(0,posX,0,70)
+	flag.BackgroundTransparency = 1
+	flag.Image = imageId
+	flag.Parent = langFrame
+	
+	local text = Instance.new("TextLabel")
+	text.Size = UDim2.new(0,140,0,30)
+	text.Position = UDim2.new(0,posX,0,170)
+	text.BackgroundTransparency = 1
+	text.Text = textBelow
+	text.TextScaled = true
+	text.TextColor3 = Color3.fromRGB(255,255,255)
+	text.Parent = langFrame
+	
+	return flag
+end
 
-local brTxt = Instance.new("TextLabel")
-brTxt.Size = UDim2.new(1,0,0,30)
-brTxt.Position = UDim2.new(0,0,1,5)
-brTxt.BackgroundTransparency = 1
-brTxt.Text = "PORTUGUÊS"
-brTxt.TextColor3 = Color3.fromRGB(255,255,255)
-brTxt.TextScaled = true
-brTxt.Parent = brBtn
+-------------------------------------------------
+-- BANDEIRAS (FUNCIONANDO)
+-------------------------------------------------
+
+-- 🇺🇸 USA FLAG
+local usaFlag = createFlag(
+	"USA",
+	"rbxassetid://8937503083", -- BANDEIRA EUA
+	40,
+	"ENGLISH"
+)
+
+-- 🇧🇷 BRAZIL FLAG
+local brFlag = createFlag(
+	"BR",
+	"rbxassetid://8937495855", -- BANDEIRA BRASIL
+	220,
+	"PORTUGUÊS"
+)
+
+-------------------------------------------------
+-- SELEÇÃO
+-------------------------------------------------
+
+usaFlag.MouseButton1Click:Connect(function()
+	languageSelected = "EN"
+	langGui:Destroy()
+	
+	if createMainGUI then
+		createMainGUI(languageSelected)
+	end
+end)
+
+brFlag.MouseButton1Click:Connect(function()
+	languageSelected = "PT"
+	langGui:Destroy()
+	
+	if createMainGUI then
+		createMainGUI(languageSelected)
+	end
+end)
 
 -------------------------------------------------
 -- MAIN GUI CREATOR
