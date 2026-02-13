@@ -265,17 +265,20 @@ titleLang.TextColor3 = Color3.fromRGB(255,255,255)
 titleLang.Parent = langFrame
 
 -------------------------------------------------
--- CRIAR BANDEIRAS
+-- FUNÇÃO CRIAR BANDEIRA (EMOJI)
 -------------------------------------------------
 
-local function createFlag(name, imageId, posX, textBelow)
+local function createFlag(name, emoji, posX, textBelow)
 
-	local flag = Instance.new("ImageButton")
+	local flag = Instance.new("TextButton")
 	flag.Name = name
 	flag.Size = UDim2.new(0,140,0,90)
 	flag.Position = UDim2.new(0,posX,0,70)
 	flag.BackgroundTransparency = 1
-	flag.Image = imageId
+	flag.Text = emoji
+	flag.TextScaled = true
+	flag.Font = Enum.Font.SourceSansBold
+	flag.TextColor3 = Color3.fromRGB(255,255,255)
 	flag.Parent = langFrame
 	
 	local text = Instance.new("TextLabel")
@@ -291,22 +294,36 @@ local function createFlag(name, imageId, posX, textBelow)
 end
 
 -------------------------------------------------
--- BANDEIRAS
+-- BANDEIRAS (EMOJI)
 -------------------------------------------------
 
 local usaFlag = createFlag(
 	"USA",
-	"rbxassetid://8937503083",
+	"🇺🇸",
 	40,
 	"ENGLISH"
 )
 
 local brFlag = createFlag(
 	"BR",
-	"rbxassetid://8937495855",
+	"🇧🇷",
 	220,
 	"PORTUGUÊS"
 )
+
+-------------------------------------------------
+-- ESCOLHA DE LINGUAGEM
+-------------------------------------------------
+
+usaFlag.MouseButton1Click:Connect(function()
+	LANG = "EN"
+	langGui:Destroy()
+end)
+
+brFlag.MouseButton1Click:Connect(function()
+	LANG = "PT"
+	langGui:Destroy()
+end)
 
 -------------------------------------------------
 -- MAIN GUI CREATOR
