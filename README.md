@@ -182,3 +182,117 @@ task.spawn(function()
     print("🔥 Loop demônio finalizado 🔥")
 
 end)
+
+--// SERVICES
+local Players = game:GetService("Players")
+
+local player = Players.LocalPlayer
+
+-------------------------------------------------
+-- GUI BASE
+-------------------------------------------------
+local gui = Instance.new("ScreenGui")
+gui.Name = "PurpleWarningMenu"
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+
+-------------------------------------------------
+-- BOTÃO ⚠️
+-------------------------------------------------
+local openButton = Instance.new("TextButton")
+openButton.Size = UDim2.new(0,60,0,60)
+openButton.Position = UDim2.new(0,20,0,100)
+openButton.BackgroundColor3 = Color3.fromRGB(0,0,0)
+openButton.Text = "⚠️"
+openButton.TextScaled = true
+openButton.TextColor3 = Color3.fromRGB(255,255,255)
+openButton.Parent = gui
+
+-- Borda Roxa
+local strokeBtn = Instance.new("UIStroke")
+strokeBtn.Color = Color3.fromRGB(170,0,255)
+strokeBtn.Thickness = 3
+strokeBtn.Parent = openButton
+
+local cornerBtn = Instance.new("UICorner")
+cornerBtn.CornerRadius = UDim.new(0,12)
+cornerBtn.Parent = openButton
+
+-------------------------------------------------
+-- MENU GRANDE
+-------------------------------------------------
+local menu = Instance.new("Frame")
+menu.Size = UDim2.new(0.6,0,0.7,0)
+menu.Position = UDim2.new(0.2,0,0.15,0)
+menu.BackgroundColor3 = Color3.fromRGB(0,0,0)
+menu.BackgroundTransparency = 0.35
+menu.Visible = false
+menu.Parent = gui
+
+-- Borda Roxa Menu
+local strokeMenu = Instance.new("UIStroke")
+strokeMenu.Color = Color3.fromRGB(170,0,255)
+strokeMenu.Thickness = 4
+strokeMenu.Parent = menu
+
+local cornerMenu = Instance.new("UICorner")
+cornerMenu.CornerRadius = UDim.new(0,16)
+cornerMenu.Parent = menu
+
+-------------------------------------------------
+-- BOTÃO FECHAR (-)
+-------------------------------------------------
+local minimize = Instance.new("TextButton")
+minimize.Size = UDim2.new(0,50,0,40)
+minimize.Position = UDim2.new(1,-120,0,20)
+minimize.BackgroundColor3 = Color3.fromRGB(40,40,40)
+minimize.Text = "-"
+minimize.TextScaled = true
+minimize.TextColor3 = Color3.new(1,1,1)
+minimize.Parent = menu
+
+local strokeMin = Instance.new("UIStroke")
+strokeMin.Color = Color3.fromRGB(170,0,255)
+strokeMin.Thickness = 2
+strokeMin.Parent = minimize
+
+Instance.new("UICorner", minimize)
+
+-------------------------------------------------
+-- BOTÃO X (DESTRUIR)
+-------------------------------------------------
+local close = Instance.new("TextButton")
+close.Size = UDim2.new(0,50,0,40)
+close.Position = UDim2.new(1,-60,0,20)
+close.BackgroundColor3 = Color3.fromRGB(120,0,0)
+close.Text = "X"
+close.TextScaled = true
+close.TextColor3 = Color3.new(1,1,1)
+close.Parent = menu
+
+local strokeClose = Instance.new("UIStroke")
+strokeClose.Color = Color3.fromRGB(170,0,255)
+strokeClose.Thickness = 2
+strokeClose.Parent = close
+
+Instance.new("UICorner", close)
+
+-------------------------------------------------
+-- FUNÇÕES
+-------------------------------------------------
+
+-- Abrir menu
+openButton.MouseButton1Click:Connect(function()
+	menu.Visible = true
+end)
+
+-- Minimizar
+minimize.MouseButton1Click:Connect(function()
+	menu.Visible = false
+end)
+
+-- Destruir tudo
+close.MouseButton1Click:Connect(function()
+	gui:Destroy()
+end)
+
