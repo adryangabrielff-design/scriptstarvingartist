@@ -3,8 +3,9 @@ local TEXTO_ALVO = "UNCLAIMED"
 
 --// SERVICES
 local Players = game:GetService("Players")
-local player = Players.LocalPlayer
 local VirtualInputManager = game:GetService("VirtualInputManager")
+
+local player = Players.LocalPlayer
 
 -------------------------------------------------
 -- HRP
@@ -35,16 +36,28 @@ end
 local function spamE(vezes)
     for i = 1, vezes do
         VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
-        task.wait(0.05)
+        task.wait(0.02)
         VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
-        task.wait(0.05)
+        task.wait(0.02)
     end
 end
 
 -------------------------------------------------
--- CLICAR BOTÃO REIVINDICAR (SE EXISTIR)
+-- SPAM CLIQUE MOUSE
 -------------------------------------------------
-local function clicarBotaoReivindicar()
+local function spamMouse(vezes)
+    for i = 1, vezes do
+        VirtualInputManager:SendMouseButtonEvent(0,0,0,true,game,0)
+        task.wait(0.02)
+        VirtualInputManager:SendMouseButtonEvent(0,0,0,false,game,0)
+        task.wait(0.02)
+    end
+end
+
+-------------------------------------------------
+-- CLICAR BOTÃO CLAIM GUI
+-------------------------------------------------
+local function clicarBotao()
 
     for _, gui in pairs(player.PlayerGui:GetDescendants()) do
         
@@ -53,9 +66,10 @@ local function clicarBotaoReivindicar()
             local nome = string.upper(gui.Name or "")
             local texto = string.upper(gui.Text or "")
             
-            if string.find(nome, "REIVIND") 
-            or string.find(texto, "REIVIND")
-            or string.find(texto, "CLAIM") then
+            if string.find(nome,"CLAIM")
+            or string.find(nome,"REIVIND")
+            or string.find(texto,"CLAIM")
+            or string.find(texto,"REIVIND") then
                 
                 pcall(function()
                     gui:Activate()
@@ -66,6 +80,21 @@ local function clicarBotaoReivindicar()
                 end)
                 
             end
+        end
+    end
+
+end
+
+-------------------------------------------------
+-- ATIVAR CLICK DETECTOR
+-------------------------------------------------
+local function ativarClickDetector(model)
+
+    for _, v in pairs(model:GetDescendants()) do
+        if v:IsA("ClickDetector") then
+            pcall(function()
+                fireclickdetector(v)
+            end)
         end
     end
 
@@ -97,7 +126,7 @@ local function acharStand(hrp)
                         
                         if dist < distMin then
                             distMin = dist
-                            maisPerto = part
+                            maisPerto = model
                         end
                     end
                 end
@@ -109,48 +138,55 @@ local function acharStand(hrp)
 end
 
 -------------------------------------------------
--- TELEPORTE INSANO
+-- TELEPORTE DEMÔNIO (TRAVA PLAYER NO STAND)
 -------------------------------------------------
-local function teleportarInsano(part, hrp)
+local function teleportarDemonio(part, hrp)
 
-    for i = 1, 10 do
+    for i = 1, 25 do
         hrp.CFrame = part.CFrame + Vector3.new(0,3,0)
         hrp.AssemblyLinearVelocity = Vector3.zero
-        task.wait(0.03)
+        task.wait(0.01)
     end
 
 end
 
 -------------------------------------------------
--- LOOP INSANO
+-- LOOP DEMÔNIO
 -------------------------------------------------
 task.spawn(function()
 
     while true do
         
         local hrp = getHRP()
-        local part = acharStand(hrp)
+        local standModel = acharStand(hrp)
 
-        if part then
+        if standModel then
             
-            -- TELEPORTE
-            teleportarInsano(part, hrp)
+            local part = getPart(standModel)
             
-            -- ESPERA
-            task.wait(0.2)
-            
-            -- SPAM TECLA E
-            spamE(10)
-            
-            -- TENTA CLICAR BOTÃO
-            clicarBotaoReivindicar()
-            
-            -- MAIS SPAM E
-            spamE(5)
-            
+            if part then
+                
+                -- TELEPORTE INSANO
+                teleportarDemonio(part, hrp)
+                
+                -- ATIVA CLICK DETECTOR
+                ativarClickDetector(standModel)
+                
+                -- SPAM INTERAÇÃO
+                spamE(20)
+                spamMouse(20)
+                
+                -- BOTÃO GUI
+                clicarBotao()
+                
+                -- MAIS SPAM
+                spamE(10)
+                spamMouse(10)
+                
+            end
         end
 
-        task.wait(0.3)
+        task.wait(0.2)
 
     end
 
