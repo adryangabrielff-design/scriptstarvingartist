@@ -143,61 +143,73 @@ local function teleportForce(cf)
 end
 
 -------------------------------------------------
--- AUTO CLAIM SIMPLES
+-- AUTO CLAIM + TELEPORT LOOP
 -------------------------------------------------
-local function autoClaim()
 
-	local char = player.Character
-	if not char then return end
+task.spawn(function()
 
-	local hrp = char:FindFirstChild("HumanoidRootPart")
-	if not hrp then return end
+	while true do
+		task.wait(1)
 
-	for _, v in pairs(workspace:GetDescendants()) do
-		if v:IsA("ProximityPrompt") then
-			if (v.Parent.Position - hrp.Position).Magnitude < 15 then
-				pcall(function()
-					fireproximityprompt(v)
-				end)
-			end
-		end
-	end
-end
+		if autoStandAtivo then
 
--------------------------------------------------
--- AUTO STAND
--------------------------------------------------
-local function autoStand()
+			local destinos = {}
 
-	if not autoStandAtivo then return end
+			for _, v in pairs(workspace:GetDescendants()) do
 
-	local destinos = {}
+				-------------------------------------------------
+				-- ACHAR STANDS UNCLAIMED
+				-------------------------------------------------
+				if v:IsA("TextLabel") or v:IsA("TextButton") then
 
-	for _, v in pairs(workspace:GetDescendants()) do
-		if v:IsA("TextLabel") or v:IsA("TextButton") then
-			
-			if v.Text then
-				local txt = string.upper(v.Text)
+					if v.Text then
+						local txt = string.upper(v.Text)
 
-				if string.find(txt, "UNCLAIMED") or string.find(txt, "YOUR TEXT HERE") then
-					
-					local adornee = v.Parent
-					if adornee and adornee:IsA("BillboardGui") and adornee.Adornee then
-						table.insert(destinos, adornee.Adornee.CFrame)
+						if string.find(txt, "UNCLAIMED")
+						or string.find(txt, "YOUR TEXT HERE")
+						or string.find(txt, "ESTANTE") then
+
+							local adornee = v.Parent
+							if adornee and adornee:IsA("BillboardGui") and adornee.Adornee then
+								table.insert(destinos, adornee.Adornee.CFrame)
+							end
+						end
 					end
 				end
+
+				-------------------------------------------------
+				-- AUTO CLICAR REIVINDICAR
+				-------------------------------------------------
+				if v:IsA("TextButton") then
+
+					if v.Text and string.find(string.upper(v.Text), "REIVINDICAR") then
+
+						pcall(function()
+							v:Activate()
+						end)
+
+						pcall(function()
+							v.MouseButton1Click:Fire()
+						end)
+
+					end
+				end
+
 			end
+
+			-------------------------------------------------
+			-- TELEPORTAR
+			-------------------------------------------------
+			if #destinos > 0 then
+				local destino = destinos[math.random(1,#destinos)]
+				teleportForce(destino)
+			end
+
 		end
+
 	end
 
-	if #destinos > 0 then
-		local destino = destinos[math.random(1, #destinos)]
-
-		teleportForce(destino)
-		task.wait(0.5)
-		autoClaim()
-	end
-end
+end)
 
 -------------------------------------------------
 -- TOGGLE AUTO
