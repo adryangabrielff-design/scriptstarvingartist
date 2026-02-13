@@ -1,44 +1,47 @@
 --// CONFIG
 local TEXTO_ALVO = "UNCLAIMED"
-local DISTANCIA_MAX = 200
 
 --// SERVICES
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
 local VirtualInputManager = game:GetService("VirtualInputManager")
+local RunService = game:GetService("RunService")
 
 local player = Players.LocalPlayer
 
---// ESPERAR PERSONAGEM
-local function getChar()
+--// PEGAR PERSONAGEM
+local function getHRP()
     local char = player.Character or player.CharacterAdded:Wait()
-    local hrp = char:WaitForChild("HumanoidRootPart")
-    return char, hrp
+    return char:WaitForChild("HumanoidRootPart")
 end
 
---// PROCURAR STAND MAIS PERTO COM "UNCLAIMED"
-local function acharStandMaisPerto(hrp)
-    local maisPerto = nil
-    local menorDist = math.huge
+--// ACHAR STAND MAIS PERTO
+local function acharStand(hrp)
+    local alvo = nil
+    local distMin = math.huge
 
     for _, obj in pairs(workspace:GetDescendants()) do
-        if obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("SurfaceGui") then
+        
+        local texto = nil
+        
+        if obj:IsA("TextLabel") or obj:IsA("TextButton") then
+            texto = obj.Text
+        end
+        
+        if texto then
+            texto = string.upper(texto)
             
-            local texto = ""
-
-            pcall(function()
-                texto = string.upper(obj.Text or "")
-            end)
-
             if string.find(texto, TEXTO_ALVO) then
                 local model = obj:FindFirstAncestorOfClass("Model")
+                
                 if model then
                     local part = model:FindFirstChildWhichIsA("BasePart")
+                    
                     if part then
                         local dist = (hrp.Position - part.Position).Magnitude
-                        if dist < menorDist then
-                            menorDist = dist
-                            maisPerto = model
+                        
+                        if dist < distMin then
+                            distMin = dist
+                            alvo = model
                         end
                     end
                 end
@@ -46,86 +49,93 @@ local function acharStandMaisPerto(hrp)
         end
     end
 
-    return maisPerto
+    return alvo
 end
 
---// TELEPORTAR
-local function teleportarParaStand(model, hrp)
+--// TELEPORTAR FORÇADO
+local function teleportar(model, hrp)
     local part = model:FindFirstChildWhichIsA("BasePart")
+    
     if part then
         hrp.CFrame = part.CFrame + Vector3.new(0,3,0)
-        return true
+        hrp.Velocity = Vector3.new(0,0,0)
     end
-    return false
 end
 
---// FORÇAR CLAIM (TODOS MÉTODOS)
-local function forcarClaim()
-    
-    -- ProximityPrompt
-    for _, v in pairs(workspace:GetDescendants()) do
-        if v:IsA("ProximityPrompt") then
-            pcall(function()
-                fireproximityprompt(v)
-            end)
-        end
-    end
-
-    -- ClickDetector
-    for _, v in pairs(workspace:GetDescendants()) do
-        if v:IsA("ClickDetector") then
-            pcall(function()
-                fireclickdetector(v)
-            end)
-        end
-    end
-
-    -- Simular tecla E
-    pcall(function()
-        VirtualInputManager:SendKeyEvent(true,"E",false,game)
-        task.wait(0.1)
-        VirtualInputManager:SendKeyEvent(false,"E",false,game)
-    end)
-
-    -- Simular clique mouse
-    pcall(function()
-        VirtualInputManager:SendMouseButtonEvent(0,0,0,true,game,0)
-        task.wait(0.1)
-        VirtualInputManager:SendMouseButtonEvent(0,0,0,false,game,0)
-    end)
-
-    -- RemoteEvents
-    for _, v in pairs(game:GetDescendants()) do
-        if v:IsA("RemoteEvent") then
-            pcall(function()
-                v:FireServer()
-            end)
-        end
-    end
-
-end
-
---// LOOP PRINCIPAL
+--// SPAM PROXIMITY
 task.spawn(function()
-    while task.wait(2) do
-        local char, hrp = getChar()
+    while true do
+        for _, v in pairs(workspace:GetDescendants()) do
+            if v:IsA("ProximityPrompt") then
+                pcall(function()
+                    fireproximityprompt(v)
+                end)
+            end
+        end
+        task.wait(0.05)
+    end
+end)
 
-        local stand = acharStandMaisPerto(hrp)
+--// SPAM CLICK DETECTOR
+task.spawn(function()
+    while true do
+        for _, v in pairs(workspace:GetDescendants()) do
+            if v:IsA("ClickDetector") then
+                pcall(function()
+                    fireclickdetector(v)
+                end)
+            end
+        end
+        task.wait(0.05)
+    end
+end)
+
+--// SPAM TECLA E
+task.spawn(function()
+    while true do
+        pcall(function()
+            VirtualInputManager:SendKeyEvent(true,"E",false,game)
+            VirtualInputManager:SendKeyEvent(false,"E",false,game)
+        end)
+        task.wait(0.05)
+    end
+end)
+
+--// SPAM CLIQUE MOUSE
+task.spawn(function()
+    while true do
+        pcall(function()
+            VirtualInputManager:SendMouseButtonEvent(0,0,0,true,game,0)
+            VirtualInputManager:SendMouseButtonEvent(0,0,0,false,game,0)
+        end)
+        task.wait(0.05)
+    end
+end)
+
+--// SPAM REMOTES
+task.spawn(function()
+    while true do
+        for _, v in pairs(game:GetDescendants()) do
+            if v:IsA("RemoteEvent") then
+                pcall(function()
+                    v:FireServer()
+                end)
+            end
+        end
+        task.wait(0.2)
+    end
+end)
+
+--// LOOP TELEPORTE ULTRA RÁPIDO
+task.spawn(function()
+    while true do
+        local hrp = getHRP()
+        local stand = acharStand(hrp)
 
         if stand then
-            print("Stand encontrado:", stand.Name)
-
-            if teleportarParaStand(stand, hrp) then
-                task.wait(1)
-
-                -- Tentar claim várias vezes
-                for i = 1,5 do
-                    forcarClaim()
-                    task.wait(0.5)
-                end
-            end
-        else
-            print("Nenhum UNCLAIMED encontrado")
+            teleportar(stand, hrp)
         end
+
+        task.wait(0.1)
     end
 end)
