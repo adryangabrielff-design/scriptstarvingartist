@@ -1,8 +1,10 @@
--- AUTO STAND MENU COMPLETO (SEGURO)
+-- AUTO STAND MENU COMPLETO (FORÇANDO TELEPORTE)
 -- Coloque em LocalScript dentro de StarterGui
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
 local player = Players.LocalPlayer
 
 -------------------------------------------------
@@ -20,7 +22,7 @@ screenGui.ResetOnSpawn = false
 screenGui.Parent = player:WaitForChild("PlayerGui")
 
 -------------------------------------------------
--- BOTÃO TOGGLE MENU (☰)
+-- BOTÃO TOGGLE MENU
 -------------------------------------------------
 local toggleButton = Instance.new("ImageButton")
 toggleButton.Size = UDim2.new(0,50,0,50)
@@ -47,8 +49,7 @@ menuFrame.Position = UDim2.new(0,90,0,20)
 menuFrame.BackgroundColor3 = Color3.fromRGB(25,25,25)
 menuFrame.Visible = false
 menuFrame.Parent = screenGui
-
-Instance.new("UICorner", menuFrame).CornerRadius = UDim.new(0,8)
+Instance.new("UICorner", menuFrame)
 
 -------------------------------------------------
 -- TÍTULO
@@ -63,7 +64,7 @@ menuTitle.Font = Enum.Font.GothamBold
 menuTitle.Parent = menuFrame
 
 -------------------------------------------------
--- BOTÃO MINIMIZAR (-)
+-- BOTÕES MENU
 -------------------------------------------------
 local minimizeButton = Instance.new("TextButton")
 minimizeButton.Size = UDim2.new(0,30,0,25)
@@ -75,9 +76,6 @@ minimizeButton.Font = Enum.Font.GothamBold
 minimizeButton.Parent = menuFrame
 Instance.new("UICorner", minimizeButton)
 
--------------------------------------------------
--- BOTÃO FECHAR (X)
--------------------------------------------------
 local closeButton = Instance.new("TextButton")
 closeButton.Size = UDim2.new(0,30,0,25)
 closeButton.Position = UDim2.new(1,-35,0,5)
@@ -98,7 +96,7 @@ container.BackgroundTransparency = 1
 container.Parent = menuFrame
 
 -------------------------------------------------
--- AUTO STAND FRAME
+-- AUTO FRAME
 -------------------------------------------------
 local autoFrame = Instance.new("Frame")
 autoFrame.Size = UDim2.new(1,-20,0,40)
@@ -107,9 +105,6 @@ autoFrame.BackgroundColor3 = Color3.fromRGB(35,35,35)
 autoFrame.Parent = container
 Instance.new("UICorner", autoFrame)
 
--------------------------------------------------
--- TEXTO
--------------------------------------------------
 local autoText = Instance.new("TextLabel")
 autoText.Size = UDim2.new(0.5,-5,1,0)
 autoText.Position = UDim2.new(0,10,0,0)
@@ -119,9 +114,6 @@ autoText.TextColor3 = Color3.new(1,1,1)
 autoText.Font = Enum.Font.Gotham
 autoText.Parent = autoFrame
 
--------------------------------------------------
--- BOTÃO TOGGLE AUTO
--------------------------------------------------
 local autoToggle = Instance.new("TextButton")
 autoToggle.Size = UDim2.new(0.5,-10,0,30)
 autoToggle.Position = UDim2.new(0.5,5,0.5,-15)
@@ -132,9 +124,6 @@ autoToggle.Font = Enum.Font.Gotham
 autoToggle.Parent = autoFrame
 Instance.new("UICorner", autoToggle)
 
--------------------------------------------------
--- INDICADOR
--------------------------------------------------
 local status = Instance.new("Frame")
 status.Size = UDim2.new(0,10,0,10)
 status.Position = UDim2.new(1,-20,0.5,-5)
@@ -144,39 +133,45 @@ status.Parent = autoFrame
 Instance.new("UICorner", status).CornerRadius = UDim.new(1,0)
 
 -------------------------------------------------
--- FUNÇÃO AUTO STAND (COM TELEPORTE UNCLAIMED)
+-- TELEPORTE FORÇADO
+-------------------------------------------------
+local function teleportForce(part)
+
+	local char = player.Character or player.CharacterAdded:Wait()
+	local hrp = char:WaitForChild("HumanoidRootPart")
+
+	for i = 1, 25 do -- força várias vezes
+		if char and hrp then
+			char:PivotTo(part.CFrame + Vector3.new(0,3,0))
+		end
+		RunService.Heartbeat:Wait()
+	end
+end
+
+-------------------------------------------------
+-- AUTO STAND
 -------------------------------------------------
 local function autoStand()
+
 	if not autoStandAtivo then return end
-	
-	local character = player.Character or player.CharacterAdded:Wait()
-	local hrp = character:WaitForChild("HumanoidRootPart")
 
-	local standsUnclaimed = {}
+	local stands = {}
 
-	for _, obj in pairs(workspace:GetDescendants()) do
-		if obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("SurfaceGui") then
-			
-			local textObj = obj:FindFirstChildOfClass("TextLabel") or obj
-			
-			if textObj and textObj.Text then
-				if string.find(string.upper(textObj.Text), "UNCLAIMED") then
-					
-					local part = obj:FindFirstAncestorWhichIsA("BasePart")
-					if part then
-						table.insert(standsUnclaimed, part)
-					end
+	for _, v in pairs(workspace:GetDescendants()) do
+		if v:IsA("TextLabel") or v:IsA("TextButton") then
+			if v.Text and string.find(string.upper(v.Text), "UNCLAIMED") then
+				
+				local part = v:FindFirstAncestorWhichIsA("BasePart")
+				if part then
+					table.insert(stands, part)
 				end
 			end
 		end
 	end
 
-	if #standsUnclaimed > 0 then
-		local escolhido = standsUnclaimed[math.random(1, #standsUnclaimed)]
-		hrp.CFrame = escolhido.CFrame + Vector3.new(0,3,0)
-		print("Teleportado para stand UNCLAIMED")
-	else
-		warn("Nenhum stand UNCLAIMED encontrado")
+	if #stands > 0 then
+		local escolhido = stands[math.random(1, #stands)]
+		teleportForce(escolhido)
 	end
 end
 
@@ -184,8 +179,9 @@ end
 -- TOGGLE AUTO
 -------------------------------------------------
 autoToggle.MouseButton1Click:Connect(function()
+
 	autoStandAtivo = not autoStandAtivo
-	
+
 	if autoStandAtivo then
 		autoToggle.Text = "ON"
 		autoToggle.BackgroundColor3 = Color3.fromRGB(0,150,0)
@@ -198,33 +194,28 @@ autoToggle.MouseButton1Click:Connect(function()
 		status.BackgroundColor3 = Color3.fromRGB(255,0,0)
 		status.BackgroundTransparency = 0.3
 	end
+
 end)
 
 -------------------------------------------------
--- MENU TOGGLE
+-- MENU
 -------------------------------------------------
 toggleButton.MouseButton1Click:Connect(function()
 	menuAberto = not menuAberto
 	menuFrame.Visible = menuAberto
 end)
 
--------------------------------------------------
--- MINIMIZAR
--------------------------------------------------
 minimizeButton.MouseButton1Click:Connect(function()
 	menuFrame.Visible = false
 	menuAberto = false
 end)
 
--------------------------------------------------
--- FECHAR TUDO
--------------------------------------------------
 closeButton.MouseButton1Click:Connect(function()
 	screenGui:Destroy()
 end)
 
 -------------------------------------------------
--- TECLA F ABRIR MENU
+-- TECLA F
 -------------------------------------------------
 UserInputService.InputBegan:Connect(function(input, gp)
 	if not gp and input.KeyCode == Enum.KeyCode.F then
