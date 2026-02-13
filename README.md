@@ -1,4 +1,4 @@
--- AUTO STAND MENU COMPLETO (VERSÃO ESTÁVEL)
+-- AUTO STAND MENU COMPLETO (ULTRA FORCE FINAL)
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
@@ -129,24 +129,75 @@ status.Parent = autoFrame
 Instance.new("UICorner", status).CornerRadius = UDim.new(1,0)
 
 -------------------------------------------------
--- TELEPORT FORÇADO
+-- TELEPORT FORCE MAX
 -------------------------------------------------
 local function teleportForce(cf)
+
 	local char = player.Character or player.CharacterAdded:Wait()
-	for i = 1, 20 do
-		char:PivotTo(cf + Vector3.new(0,3,0))
+
+	for i = 1, 40 do
+		char:PivotTo(cf + Vector3.new(0,4,0))
 		RunService.Heartbeat:Wait()
 	end
 end
 
 -------------------------------------------------
--- AUTO CLAIM SIMPLES
+-- PEGAR DESTINOS (TODOS MÉTODOS)
+-------------------------------------------------
+local function getDestinos()
+
+	local destinos = {}
+
+	-- Método Billboard + Texto
+	for _, v in pairs(workspace:GetDescendants()) do
+		if v:IsA("TextLabel") or v:IsA("TextButton") then
+			if v.Text then
+				local txt = string.upper(v.Text)
+
+				if string.find(txt,"UNCLAIMED") or string.find(txt,"YOUR TEXT HERE") then
+
+					local bb = v:FindFirstAncestorWhichIsA("BillboardGui")
+					if bb and bb.Adornee then
+						table.insert(destinos, bb.Adornee.CFrame)
+					end
+				end
+			end
+		end
+	end
+
+	-- Método Modelo + Part
+	for _, m in pairs(workspace:GetDescendants()) do
+		if m:IsA("Model") then
+			local part = m:FindFirstChildWhichIsA("BasePart", true)
+			if part then
+				table.insert(destinos, part.CFrame)
+			end
+		end
+	end
+
+	return destinos
+end
+
+-------------------------------------------------
+-- AUTO CLAIM MAX
 -------------------------------------------------
 local function autoClaim()
-	-- Tecla E
-	VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
-	task.wait(0.1)
-	VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+
+	-- GUI botão
+	local pg = player:FindFirstChild("PlayerGui")
+	if pg then
+		for _, gui in pairs(pg:GetDescendants()) do
+			if gui:IsA("TextButton") then
+				local txt = string.lower(gui.Text or "")
+				if string.find(txt,"reivind") then
+					pcall(function()
+						gui:Activate()
+						gui.MouseButton1Click:Fire()
+					end)
+				end
+			end
+		end
+	end
 
 	-- ClickDetector
 	for _, v in pairs(workspace:GetDescendants()) do
@@ -156,48 +207,38 @@ local function autoClaim()
 			end)
 		end
 	end
+
+	-- Tecla E spam
+	for i=1,5 do
+		VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+		task.wait(0.05)
+		VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+	end
+
 end
 
 -------------------------------------------------
--- AUTO STAND LOOP
+-- LOOP
 -------------------------------------------------
-local function autoStandLoop()
+local function autoLoop()
 
 	while autoStandAtivo do
 
-		local destinos = {}
-
-		for _, v in pairs(workspace:GetDescendants()) do
-			if v:IsA("TextLabel") or v:IsA("TextButton") then
-				if v.Text then
-					local txt = string.upper(v.Text)
-
-					if string.find(txt, "UNCLAIMED") or string.find(txt, "YOUR TEXT HERE") then
-
-						local billboard = v:FindFirstAncestorWhichIsA("BillboardGui")
-						if billboard and billboard.Adornee then
-							table.insert(destinos, billboard.Adornee.CFrame)
-						end
-
-					end
-				end
-			end
-		end
+		local destinos = getDestinos()
 
 		if #destinos > 0 then
 			local destino = destinos[math.random(1,#destinos)]
 			teleportForce(destino)
-			task.wait(1)
+			task.wait(0.5)
 			autoClaim()
 		end
 
 		task.wait(2)
-
 	end
 end
 
 -------------------------------------------------
--- TOGGLE AUTO
+-- TOGGLE
 -------------------------------------------------
 autoToggle.MouseButton1Click:Connect(function()
 
@@ -208,7 +249,7 @@ autoToggle.MouseButton1Click:Connect(function()
 		autoToggle.BackgroundColor3 = Color3.fromRGB(0,150,0)
 		status.BackgroundColor3 = Color3.fromRGB(0,255,0)
 		status.BackgroundTransparency = 0
-		task.spawn(autoStandLoop)
+		task.spawn(autoLoop)
 	else
 		autoToggle.Text = "OFF"
 		autoToggle.BackgroundColor3 = Color3.fromRGB(60,60,60)
