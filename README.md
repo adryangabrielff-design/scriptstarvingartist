@@ -185,8 +185,16 @@ end)
 
 --// SERVICES
 local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
 
 local player = Players.LocalPlayer
+
+-------------------------------------------------
+-- BLUR EFFECT
+-------------------------------------------------
+local blur = Instance.new("BlurEffect")
+blur.Size = 0
+blur.Parent = Lighting
 
 -------------------------------------------------
 -- GUI BASE
@@ -197,51 +205,44 @@ gui.ResetOnSpawn = false
 gui.Parent = player:WaitForChild("PlayerGui")
 
 -------------------------------------------------
--- BOTÃO ⚠️ (MAIS PRA CIMA + EMOJI MENOR)
+-- BOTÃO ⚠️ (POSIÇÃO NOVA)
 -------------------------------------------------
 local openButton = Instance.new("TextButton")
 openButton.Size = UDim2.new(0,60,0,60)
-openButton.Position = UDim2.new(0,10,0,20) -- MAIS PRA CIMA
+openButton.Position = UDim2.new(0,10,0,20)
 openButton.BackgroundColor3 = Color3.fromRGB(0,0,0)
 openButton.Text = "⚠️"
-openButton.TextScaled = false
-openButton.TextSize = 28 -- EMOJI MENOR
+openButton.TextSize = 28
 openButton.TextColor3 = Color3.fromRGB(255,255,255)
 openButton.Parent = gui
 
--- Borda Roxa
 local strokeBtn = Instance.new("UIStroke")
 strokeBtn.Color = Color3.fromRGB(170,0,255)
 strokeBtn.Thickness = 3
 strokeBtn.Parent = openButton
 
-local cornerBtn = Instance.new("UICorner")
-cornerBtn.CornerRadius = UDim.new(0,12)
-cornerBtn.Parent = openButton
+Instance.new("UICorner", openButton)
 
 -------------------------------------------------
--- MENU GRANDE (AUMENTADO)
+-- MENU PRINCIPAL
 -------------------------------------------------
 local menu = Instance.new("Frame")
-menu.Size = UDim2.new(0.8,0,0.8,0) -- MAIOR
+menu.Size = UDim2.new(0.8,0,0.8,0)
 menu.Position = UDim2.new(0.1,0,0.1,0)
 menu.BackgroundColor3 = Color3.fromRGB(0,0,0)
 menu.BackgroundTransparency = 0.35
 menu.Visible = false
 menu.Parent = gui
 
--- Borda Roxa Menu
 local strokeMenu = Instance.new("UIStroke")
 strokeMenu.Color = Color3.fromRGB(170,0,255)
 strokeMenu.Thickness = 4
 strokeMenu.Parent = menu
 
-local cornerMenu = Instance.new("UICorner")
-cornerMenu.CornerRadius = UDim.new(0,16)
-cornerMenu.Parent = menu
+Instance.new("UICorner", menu)
 
 -------------------------------------------------
--- BOTÃO FECHAR (-)
+-- BOTÃO -
 -------------------------------------------------
 local minimize = Instance.new("TextButton")
 minimize.Size = UDim2.new(0,60,0,45)
@@ -254,13 +255,12 @@ minimize.Parent = menu
 
 local strokeMin = Instance.new("UIStroke")
 strokeMin.Color = Color3.fromRGB(170,0,255)
-strokeMin.Thickness = 2
 strokeMin.Parent = minimize
 
 Instance.new("UICorner", minimize)
 
 -------------------------------------------------
--- BOTÃO X (DESTRUIR)
+-- BOTÃO X
 -------------------------------------------------
 local close = Instance.new("TextButton")
 close.Size = UDim2.new(0,60,0,45)
@@ -273,26 +273,90 @@ close.Parent = menu
 
 local strokeClose = Instance.new("UIStroke")
 strokeClose.Color = Color3.fromRGB(170,0,255)
-strokeClose.Thickness = 2
 strokeClose.Parent = close
 
 Instance.new("UICorner", close)
 
 -------------------------------------------------
+-- GUI CONFIRMAÇÃO
+-------------------------------------------------
+local confirmGui = Instance.new("Frame")
+confirmGui.Size = UDim2.new(0,400,0,200)
+confirmGui.Position = UDim2.new(0.5,-200,0.5,-100)
+confirmGui.BackgroundColor3 = Color3.fromRGB(0,0,0)
+confirmGui.BackgroundTransparency = 0.2
+confirmGui.Visible = false
+confirmGui.Parent = gui
+
+local strokeConfirm = Instance.new("UIStroke")
+strokeConfirm.Color = Color3.fromRGB(170,0,255)
+strokeConfirm.Thickness = 3
+strokeConfirm.Parent = confirmGui
+
+Instance.new("UICorner", confirmGui)
+
+-------------------------------------------------
+-- TEXTO AVISO
+-------------------------------------------------
+local confirmText = Instance.new("TextLabel")
+confirmText.Size = UDim2.new(1,-20,0,80)
+confirmText.Position = UDim2.new(0,10,0,20)
+confirmText.BackgroundTransparency = 1
+confirmText.Text = "Tem certeza que deseja eliminar o menu?"
+confirmText.TextScaled = true
+confirmText.TextColor3 = Color3.new(1,1,1)
+confirmText.Parent = confirmGui
+
+-------------------------------------------------
+-- BOTÃO ✅
+-------------------------------------------------
+local yesButton = Instance.new("TextButton")
+yesButton.Size = UDim2.new(0,120,0,50)
+yesButton.Position = UDim2.new(0.2,0,1,-70)
+yesButton.Text = "✅"
+yesButton.TextScaled = true
+yesButton.BackgroundColor3 = Color3.fromRGB(0,120,0)
+yesButton.Parent = confirmGui
+Instance.new("UICorner", yesButton)
+
+-------------------------------------------------
+-- BOTÃO ❌
+-------------------------------------------------
+local noButton = Instance.new("TextButton")
+noButton.Size = UDim2.new(0,120,0,50)
+noButton.Position = UDim2.new(0.6,0,1,-70)
+noButton.Text = "❌"
+noButton.TextScaled = true
+noButton.BackgroundColor3 = Color3.fromRGB(120,0,0)
+noButton.Parent = confirmGui
+Instance.new("UICorner", noButton)
+
+-------------------------------------------------
 -- FUNÇÕES
 -------------------------------------------------
 
--- Abrir menu
 openButton.MouseButton1Click:Connect(function()
 	menu.Visible = true
 end)
 
--- Minimizar
 minimize.MouseButton1Click:Connect(function()
 	menu.Visible = false
 end)
 
--- Destruir tudo
+-- Abrir aviso + ativar blur
 close.MouseButton1Click:Connect(function()
+	confirmGui.Visible = true
+	blur.Size = 24
+end)
+
+-- Confirmar deletar
+yesButton.MouseButton1Click:Connect(function()
+	blur:Destroy()
 	gui:Destroy()
+end)
+
+-- Cancelar
+noButton.MouseButton1Click:Connect(function()
+	confirmGui.Visible = false
+	blur.Size = 0
 end)
