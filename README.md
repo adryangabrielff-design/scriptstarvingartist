@@ -183,7 +183,9 @@ task.spawn(function()
 
 end)
 
+-------------------------------------------------
 -- SERVICES
+-------------------------------------------------
 local Players = game:GetService("Players")
 local Lighting = game:GetService("Lighting")
 
@@ -226,23 +228,18 @@ local TEXT = {
 -- LANGUAGE SELECT GUI
 -------------------------------------------------
 
-local Players = game:GetService("Players")
-local player = Players.LocalPlayer
-
-local languageSelected = nil
-
 local langGui = Instance.new("ScreenGui")
 langGui.Name = "LanguageSelect"
-langGui.Parent = player.PlayerGui
+langGui.Parent = PlayerGui
 langGui.ResetOnSpawn = false
 
 -------------------------------------------------
--- FRAME CENTRAL MENOR
+-- FRAME CENTRAL
 -------------------------------------------------
 
 local langFrame = Instance.new("Frame")
-langFrame.Size = UDim2.new(0,400,0,260) -- MENOR
-langFrame.Position = UDim2.new(0.5,-200,0.5,-130) -- CENTRAL
+langFrame.Size = UDim2.new(0,400,0,260)
+langFrame.Position = UDim2.new(0.5,-200,0.5,-130)
 langFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
 langFrame.BackgroundTransparency = 0.25
 langFrame.Parent = langGui
@@ -258,17 +255,17 @@ Instance.new("UICorner", langFrame)
 -- TITULO
 -------------------------------------------------
 
-local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1,0,0,40)
-title.Position = UDim2.new(0,0,0,5)
-title.BackgroundTransparency = 1
-title.Text = "USA / BR"
-title.TextScaled = true
-title.TextColor3 = Color3.fromRGB(255,255,255)
-title.Parent = langFrame
+local titleLang = Instance.new("TextLabel")
+titleLang.Size = UDim2.new(1,0,0,40)
+titleLang.Position = UDim2.new(0,0,0,5)
+titleLang.BackgroundTransparency = 1
+titleLang.Text = "USA / BR"
+titleLang.TextScaled = true
+titleLang.TextColor3 = Color3.fromRGB(255,255,255)
+titleLang.Parent = langFrame
 
 -------------------------------------------------
--- FUNÇÃO CRIAR BANDEIRA
+-- CRIAR BANDEIRAS
 -------------------------------------------------
 
 local function createFlag(name, imageId, posX, textBelow)
@@ -294,57 +291,37 @@ local function createFlag(name, imageId, posX, textBelow)
 end
 
 -------------------------------------------------
--- BANDEIRAS (FUNCIONANDO)
+-- BANDEIRAS
 -------------------------------------------------
 
--- 🇺🇸 USA FLAG
 local usaFlag = createFlag(
 	"USA",
-	"rbxassetid://8937503083", -- BANDEIRA EUA
+	"rbxassetid://8937503083",
 	40,
 	"ENGLISH"
 )
 
--- 🇧🇷 BRAZIL FLAG
 local brFlag = createFlag(
 	"BR",
-	"rbxassetid://8937495855", -- BANDEIRA BRASIL
+	"rbxassetid://8937495855",
 	220,
 	"PORTUGUÊS"
 )
 
 -------------------------------------------------
--- SELEÇÃO
--------------------------------------------------
-
-usaFlag.MouseButton1Click:Connect(function()
-	languageSelected = "EN"
-	langGui:Destroy()
-	
-	if createMainGUI then
-		createMainGUI(languageSelected)
-	end
-end)
-
-brFlag.MouseButton1Click:Connect(function()
-	languageSelected = "PT"
-	langGui:Destroy()
-	
-	if createMainGUI then
-		createMainGUI(languageSelected)
-	end
-end)
-
--------------------------------------------------
 -- MAIN GUI CREATOR
 -------------------------------------------------
+
 local function createMainGUI()
 
 	local gui = Instance.new("ScreenGui")
 	gui.Parent = PlayerGui
 	gui.ResetOnSpawn = false
 
+	-------------------------------------------------
 	-- OPEN BUTTON ⚠️
+	-------------------------------------------------
+
 	local openButton = Instance.new("TextButton")
 	openButton.Size = UDim2.new(0,60,0,60)
 	openButton.Position = UDim2.new(0,10,0,20)
@@ -354,12 +331,15 @@ local function createMainGUI()
 	openButton.TextColor3 = Color3.fromRGB(255,255,255)
 	openButton.Parent = gui
 
-	local stroke = Instance.new("UIStroke")
-	stroke.Color = Color3.fromRGB(170,0,255)
-	stroke.Thickness = 2
-	stroke.Parent = openButton
+	local strokeBtn = Instance.new("UIStroke")
+	strokeBtn.Color = Color3.fromRGB(170,0,255)
+	strokeBtn.Thickness = 2
+	strokeBtn.Parent = openButton
 
+	-------------------------------------------------
 	-- MAIN MENU
+	-------------------------------------------------
+
 	local mainFrame = Instance.new("Frame")
 	mainFrame.Size = UDim2.new(0,800,0,500)
 	mainFrame.Position = UDim2.new(0.5,-400,0.5,-250)
@@ -373,7 +353,10 @@ local function createMainGUI()
 	stroke2.Thickness = 2
 	stroke2.Parent = mainFrame
 
+	-------------------------------------------------
 	-- TITLE
+	-------------------------------------------------
+
 	local title = Instance.new("TextLabel")
 	title.Size = UDim2.new(1,0,0,50)
 	title.BackgroundTransparency = 1
@@ -382,21 +365,26 @@ local function createMainGUI()
 	title.TextScaled = true
 	title.Parent = mainFrame
 
-	-- CLOSE X
+	-------------------------------------------------
+	-- CLOSE / MIN
+	-------------------------------------------------
+
 	local close = Instance.new("TextButton")
 	close.Size = UDim2.new(0,50,0,50)
 	close.Position = UDim2.new(1,-60,0,5)
 	close.Text = TEXT[LANG].CLOSE
 	close.Parent = mainFrame
 
-	-- MINIMIZE
 	local min = Instance.new("TextButton")
 	min.Size = UDim2.new(0,50,0,50)
 	min.Position = UDim2.new(1,-120,0,5)
 	min.Text = TEXT[LANG].MIN
 	min.Parent = mainFrame
 
+	-------------------------------------------------
 	-- CONFIRM GUI
+	-------------------------------------------------
+
 	local confirm = Instance.new("Frame")
 	confirm.Size = UDim2.new(0,400,0,200)
 	confirm.Position = UDim2.new(0.5,-200,0.5,-100)
@@ -425,7 +413,7 @@ local function createMainGUI()
 	no.Parent = confirm
 
 	-------------------------------------------------
-	-- BUTTON EVENTS
+	-- EVENTS
 	-------------------------------------------------
 
 	openButton.MouseButton1Click:Connect(function()
@@ -457,13 +445,13 @@ end
 -- LANGUAGE BUTTON EVENTS
 -------------------------------------------------
 
-usaBtn.MouseButton1Click:Connect(function()
+usaFlag.MouseButton1Click:Connect(function()
 	LANG = "EN"
 	langGui:Destroy()
 	createMainGUI()
 end)
 
-brBtn.MouseButton1Click:Connect(function()
+brFlag.MouseButton1Click:Connect(function()
 	LANG = "PT"
 	langGui:Destroy()
 	createMainGUI()
