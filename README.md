@@ -1,4 +1,4 @@
--- AUTO STAND MENU (APENAS UNCLAIMED)
+-- AUTO STAND MENU (UNCLAIMED MAIS PERTO)
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
@@ -41,7 +41,7 @@ toggleIcon.Font = Enum.Font.GothamBold
 toggleIcon.Parent = toggleButton
 
 -------------------------------------------------
--- FRAME MENU
+-- MENU FRAME
 -------------------------------------------------
 local menuFrame = Instance.new("Frame")
 menuFrame.Size = UDim2.new(0,260,0,170)
@@ -133,7 +133,6 @@ Instance.new("UICorner", status).CornerRadius = UDim.new(1,0)
 -------------------------------------------------
 local function teleportForce(cf)
 	local char = player.Character or player.CharacterAdded:Wait()
-
 	for i=1,40 do
 		char:PivotTo(cf + Vector3.new(0,4,0))
 		RunService.Heartbeat:Wait()
@@ -141,24 +140,36 @@ local function teleportForce(cf)
 end
 
 -------------------------------------------------
--- PEGAR APENAS STANDS UNCLAIMED
+-- PEGAR STAND MAIS PERTO UNCLAIMED
 -------------------------------------------------
-local function getUnclaimedStands()
+local function getClosestUnclaimed()
 
-	local destinos = {}
+	local char = player.Character
+	if not char then return nil end
+
+	local root = char:FindFirstChild("HumanoidRootPart")
+	if not root then return nil end
+
+	local closestCF = nil
+	local closestDist = math.huge
 
 	for _, gui in pairs(workspace:GetDescendants()) do
-		if gui:IsA("BillboardGui") then
+		if gui:IsA("BillboardGui") and gui.Adornee then
 
 			for _, obj in pairs(gui:GetDescendants()) do
 				if obj:IsA("TextLabel") or obj:IsA("TextButton") then
 
 					local txt = string.upper(obj.Text or "")
 
-					if string.find(txt, "UNCLAIMED") then
-						if gui.Adornee then
-							table.insert(destinos, gui.Adornee.CFrame)
+					if string.find(txt,"UNCLAIMED") then
+
+						local dist = (root.Position - gui.Adornee.Position).Magnitude
+
+						if dist < closestDist then
+							closestDist = dist
+							closestCF = gui.Adornee.CFrame
 						end
+
 					end
 				end
 			end
@@ -166,7 +177,7 @@ local function getUnclaimedStands()
 		end
 	end
 
-	return destinos
+	return closestCF
 end
 
 -------------------------------------------------
@@ -174,23 +185,18 @@ end
 -------------------------------------------------
 local function autoClaim()
 
-	-- GUI botão reivindicar
-	local pg = player:FindFirstChild("PlayerGui")
-	if pg then
-		for _, gui in pairs(pg:GetDescendants()) do
-			if gui:IsA("TextButton") then
-				local txt = string.lower(gui.Text or "")
-				if string.find(txt,"reivind") then
-					pcall(function()
-						gui:Activate()
-						gui.MouseButton1Click:Fire()
-					end)
-				end
+	for _, gui in pairs(player.PlayerGui:GetDescendants()) do
+		if gui:IsA("TextButton") then
+			local txt = string.lower(gui.Text or "")
+			if txt:find("reivind") then
+				pcall(function()
+					gui:Activate()
+					gui.MouseButton1Click:Fire()
+				end)
 			end
 		end
 	end
 
-	-- ClickDetector
 	for _, v in pairs(workspace:GetDescendants()) do
 		if v:IsA("ClickDetector") then
 			pcall(function()
@@ -199,7 +205,6 @@ local function autoClaim()
 		end
 	end
 
-	-- Tecla E spam
 	for i=1,5 do
 		VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
 		task.wait(0.05)
@@ -212,14 +217,12 @@ end
 -- LOOP
 -------------------------------------------------
 local function autoLoop()
-
 	while autoStandAtivo do
 
-		local stands = getUnclaimedStands()
+		local cf = getClosestUnclaimed()
 
-		if #stands > 0 then
-			local destino = stands[math.random(1,#stands)]
-			teleportForce(destino)
+		if cf then
+			teleportForce(cf)
 			task.wait(0.5)
 			autoClaim()
 		end
