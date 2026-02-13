@@ -1,8 +1,9 @@
--- AUTO STAND MENU COMPLETO (MODEL STANDS FIX)
+-- AUTO STAND MENU COMPLETO (FORÇA MÁXIMA)
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
 
 local player = Players.LocalPlayer
 
@@ -23,24 +24,16 @@ screenGui.Parent = player:WaitForChild("PlayerGui")
 -------------------------------------------------
 -- BOTÃO MENU
 -------------------------------------------------
-local toggleButton = Instance.new("ImageButton")
+local toggleButton = Instance.new("TextButton")
 toggleButton.Size = UDim2.new(0,50,0,50)
 toggleButton.Position = UDim2.new(0,20,0,20)
-toggleButton.BackgroundColor3 = Color3.fromRGB(35,35,35)
-toggleButton.BorderSizePixel = 0
+toggleButton.Text = "☰"
+toggleButton.BackgroundColor3 = Color3.fromRGB(40,40,40)
+toggleButton.TextColor3 = Color3.new(1,1,1)
 toggleButton.Parent = screenGui
 
-local toggleIcon = Instance.new("TextLabel")
-toggleIcon.Size = UDim2.new(1,0,1,0)
-toggleIcon.BackgroundTransparency = 1
-toggleIcon.Text = "☰"
-toggleIcon.TextColor3 = Color3.new(1,1,1)
-toggleIcon.TextSize = 30
-toggleIcon.Font = Enum.Font.GothamBold
-toggleIcon.Parent = toggleButton
-
 -------------------------------------------------
--- MENU FRAME
+-- MENU
 -------------------------------------------------
 local menuFrame = Instance.new("Frame")
 menuFrame.Size = UDim2.new(0,260,0,170)
@@ -58,36 +51,13 @@ menuTitle.Size = UDim2.new(1,0,0,35)
 menuTitle.BackgroundColor3 = Color3.fromRGB(45,45,45)
 menuTitle.Text = "AUTO STAND MENU"
 menuTitle.TextColor3 = Color3.new(1,1,1)
-menuTitle.TextSize = 16
-menuTitle.Font = Enum.Font.GothamBold
 menuTitle.Parent = menuFrame
 
 -------------------------------------------------
--- BOTÕES
--------------------------------------------------
-local minimizeButton = Instance.new("TextButton")
-minimizeButton.Size = UDim2.new(0,30,0,25)
-minimizeButton.Position = UDim2.new(1,-70,0,5)
-minimizeButton.Text = "-"
-minimizeButton.BackgroundColor3 = Color3.fromRGB(70,70,70)
-minimizeButton.TextColor3 = Color3.new(1,1,1)
-minimizeButton.Parent = menuFrame
-Instance.new("UICorner", minimizeButton)
-
-local closeButton = Instance.new("TextButton")
-closeButton.Size = UDim2.new(0,30,0,25)
-closeButton.Position = UDim2.new(1,-35,0,5)
-closeButton.Text = "X"
-closeButton.BackgroundColor3 = Color3.fromRGB(170,0,0)
-closeButton.TextColor3 = Color3.new(1,1,1)
-closeButton.Parent = menuFrame
-Instance.new("UICorner", closeButton)
-
--------------------------------------------------
--- AUTO TOGGLE
+-- BOTÃO AUTO
 -------------------------------------------------
 local autoToggle = Instance.new("TextButton")
-autoToggle.Size = UDim2.new(0.8,0,0,35)
+autoToggle.Size = UDim2.new(0.8,0,0,40)
 autoToggle.Position = UDim2.new(0.1,0,0.5,0)
 autoToggle.Text = "AUTO OFF"
 autoToggle.BackgroundColor3 = Color3.fromRGB(60,60,60)
@@ -96,49 +66,55 @@ autoToggle.Parent = menuFrame
 Instance.new("UICorner", autoToggle)
 
 -------------------------------------------------
--- TELEPORT FORTE MODEL
+-- TELEPORT FORÇA BRUTA
 -------------------------------------------------
-local function teleportModel(model)
+local function forceTeleport(cf)
 
 	local char = player.Character or player.CharacterAdded:Wait()
 	local root = char:WaitForChild("HumanoidRootPart")
 
-	local cf
-
-	if model.PrimaryPart then
-		cf = model.PrimaryPart.CFrame
-	else
-		cf = model:GetPivot()
-	end
-
-	for i = 1, 80 do
-		root.CFrame = cf + Vector3.new(0,5,0)
+	for i = 1,120 do
+		root.CFrame = cf + Vector3.new(0,6,0)
 		RunService.Heartbeat:Wait()
 	end
 
 end
 
 -------------------------------------------------
--- PEGAR MODELS STAND LIVRES
+-- PEGAR POSIÇÃO QUALQUER DE MODEL
 -------------------------------------------------
-local function getFreeStandModels()
+local function getModelPosition(model)
 
-	local modelos = {}
+	if model.PrimaryPart then
+		return model.PrimaryPart.CFrame
+	end
 
-	for _, gui in pairs(workspace:GetDescendants()) do
+	local cf,size = model:GetBoundingBox()
+	return cf
 
-		if gui:IsA("BillboardGui") and gui.Adornee then
+end
 
-			local temLivre = false
+-------------------------------------------------
+-- ACHAR STANDS
+-------------------------------------------------
+local function getStands()
 
-			for _, txt in pairs(gui:GetDescendants()) do
+	local lista = {}
 
-				if txt:IsA("TextLabel") or txt:IsA("TextButton") then
+	for _, obj in pairs(workspace:GetDescendants()) do
 
-					local t = string.upper(txt.Text or "")
+		if obj:IsA("Model") then
+
+			local temTexto = false
+
+			for _, d in pairs(obj:GetDescendants()) do
+
+				if d:IsA("TextLabel") or d:IsA("TextButton") then
+
+					local t = string.upper(d.Text or "")
 
 					if t:find("UNCLAIMED") or t:find("YOUR TEXT HERE") then
-						temLivre = true
+						temTexto = true
 						break
 					end
 
@@ -146,24 +122,51 @@ local function getFreeStandModels()
 
 			end
 
-			if temLivre then
-				local model = gui.Adornee:FindFirstAncestorOfClass("Model")
-				if model then
-					table.insert(modelos, model)
-				end
+			if temTexto then
+				table.insert(lista,obj)
 			end
 
 		end
 
 	end
 
-	return modelos
+	return lista
 end
 
 -------------------------------------------------
--- AUTO CLAIM CLICKDETECTOR
+-- CLICK GUI REIVINDICAR
 -------------------------------------------------
-local function autoClaim()
+local function clickReivindicarGUI()
+
+	for _, gui in pairs(player.PlayerGui:GetDescendants()) do
+
+		if gui:IsA("TextButton") then
+
+			local t = string.upper(gui.Text or "")
+
+			if t:find("REIVINDICAR") then
+
+				local pos = gui.AbsolutePosition
+				local size = gui.AbsoluteSize
+
+				local x = pos.X + size.X/2
+				local y = pos.Y + size.Y/2
+
+				VirtualInputManager:SendMouseButtonEvent(x,y,0,true,game,0)
+				VirtualInputManager:SendMouseButtonEvent(x,y,0,false,game,0)
+
+			end
+
+		end
+
+	end
+
+end
+
+-------------------------------------------------
+-- CLICK CLICKDETECTOR
+-------------------------------------------------
+local function spamClickDetector()
 
 	for _, v in pairs(workspace:GetDescendants()) do
 		if v:IsA("ClickDetector") then
@@ -176,26 +179,32 @@ local function autoClaim()
 end
 
 -------------------------------------------------
--- LOOP AUTO
+-- LOOP AUTO FORÇA MÁXIMA
 -------------------------------------------------
 task.spawn(function()
 
 	while true do
-		task.wait(2)
+		task.wait(1)
 
 		if autoStandAtivo then
 
-			local stands = getFreeStandModels()
+			local stands = getStands()
 
 			if #stands > 0 then
 
 				local escolhido = stands[math.random(1,#stands)]
 
-				teleportModel(escolhido)
+				local pos = getModelPosition(escolhido)
 
-				task.wait(1)
+				forceTeleport(pos)
 
-				autoClaim()
+				task.wait(0.5)
+
+				for i = 1,10 do
+					spamClickDetector()
+					clickReivindicarGUI()
+					task.wait(0.2)
+				end
 
 			end
 
@@ -206,7 +215,7 @@ task.spawn(function()
 end)
 
 -------------------------------------------------
--- TOGGLE AUTO
+-- TOGGLE
 -------------------------------------------------
 autoToggle.MouseButton1Click:Connect(function()
 
@@ -230,19 +239,7 @@ toggleButton.MouseButton1Click:Connect(function()
 	menuFrame.Visible = menuAberto
 end)
 
-minimizeButton.MouseButton1Click:Connect(function()
-	menuFrame.Visible = false
-	menuAberto = false
-end)
-
-closeButton.MouseButton1Click:Connect(function()
-	screenGui:Destroy()
-end)
-
--------------------------------------------------
--- TECLA F
--------------------------------------------------
-UserInputService.InputBegan:Connect(function(input, gp)
+UserInputService.InputBegan:Connect(function(input,gp)
 	if not gp and input.KeyCode == Enum.KeyCode.F then
 		menuAberto = not menuAberto
 		menuFrame.Visible = menuAberto
