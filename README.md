@@ -227,15 +227,10 @@ local TEXT = {
 -------------------------------------------------
 -- LANGUAGE SELECT GUI
 -------------------------------------------------
-
 local langGui = Instance.new("ScreenGui")
 langGui.Name = "LanguageSelect"
 langGui.Parent = PlayerGui
 langGui.ResetOnSpawn = false
-
--------------------------------------------------
--- FRAME CENTRAL
--------------------------------------------------
 
 local langFrame = Instance.new("Frame")
 langFrame.Size = UDim2.new(0,400,0,260)
@@ -251,114 +246,74 @@ stroke.Parent = langFrame
 
 Instance.new("UICorner", langFrame)
 
--------------------------------------------------
--- TITULO
--------------------------------------------------
-
 local titleLang = Instance.new("TextLabel")
 titleLang.Size = UDim2.new(1,0,0,40)
 titleLang.Position = UDim2.new(0,0,0,5)
 titleLang.BackgroundTransparency = 1
-titleLang.Text = "USA / BR"
+titleLang.Text = "ESCOLHA O IDIOMA"
 titleLang.TextScaled = true
 titleLang.TextColor3 = Color3.fromRGB(255,255,255)
 titleLang.Parent = langFrame
 
 -------------------------------------------------
--- FUNÇÃO CRIAR BANDEIRA (EMOJI)
+-- CRIAR BANDEIRAS EM EMOJI
 -------------------------------------------------
-
 local function createFlag(name, emoji, posX, textBelow)
 
+	local holder = Instance.new("Frame")
+	holder.Size = UDim2.new(0,140,0,120)
+	holder.Position = UDim2.new(0,posX,0,70)
+	holder.BackgroundTransparency = 1
+	holder.Parent = langFrame
+
 	local flag = Instance.new("TextButton")
-	flag.Name = name
-	flag.Size = UDim2.new(0,140,0,90)
-	flag.Position = UDim2.new(0,posX,0,70)
+	flag.Size = UDim2.new(1,0,0,80)
 	flag.BackgroundTransparency = 1
 	flag.Text = emoji
 	flag.TextScaled = true
-	flag.Font = Enum.Font.SourceSansBold
-	flag.TextColor3 = Color3.fromRGB(255,255,255)
-	flag.Parent = langFrame
-	
+	flag.Parent = holder
+
 	local text = Instance.new("TextLabel")
-	text.Size = UDim2.new(0,140,0,30)
-	text.Position = UDim2.new(0,posX,0,170)
+	text.Size = UDim2.new(1,0,0,30)
+	text.Position = UDim2.new(0,0,1,-30)
 	text.BackgroundTransparency = 1
 	text.Text = textBelow
 	text.TextScaled = true
 	text.TextColor3 = Color3.fromRGB(255,255,255)
-	text.Parent = langFrame
-	
+	text.Parent = holder
+
 	return flag
 end
 
--------------------------------------------------
--- BANDEIRAS (EMOJI)
--------------------------------------------------
-
-local usaFlag = createFlag(
-	"USA",
-	"🇺🇸",
-	40,
-	"ENGLISH"
-)
-
-local brFlag = createFlag(
-	"BR",
-	"🇧🇷",
-	220,
-	"PORTUGUÊS"
-)
-
--------------------------------------------------
--- ESCOLHA DE LINGUAGEM
--------------------------------------------------
-
-usaFlag.MouseButton1Click:Connect(function()
-	LANG = "EN"
-	langGui:Destroy()
-end)
-
-brFlag.MouseButton1Click:Connect(function()
-	LANG = "PT"
-	langGui:Destroy()
-end)
+local usaFlag = createFlag("USA","🇺🇸",40,"ENGLISH")
+local brFlag = createFlag("BR","🇧🇷",220,"PORTUGUÊS")
 
 -------------------------------------------------
 -- MAIN GUI CREATOR
 -------------------------------------------------
-
 local function createMainGUI()
 
 	local gui = Instance.new("ScreenGui")
 	gui.Parent = PlayerGui
 	gui.ResetOnSpawn = false
 
-	-------------------------------------------------
-	-- OPEN BUTTON ⚠️
-	-------------------------------------------------
-
+	-- OPEN BUTTON
 	local openButton = Instance.new("TextButton")
 	openButton.Size = UDim2.new(0,60,0,60)
-	openButton.Position = UDim2.new(0,10,0,20)
+	openButton.Position = UDim2.new(0,10,0,5)
 	openButton.BackgroundColor3 = Color3.fromRGB(0,0,0)
 	openButton.Text = "⚠️"
 	openButton.TextScaled = true
 	openButton.TextColor3 = Color3.fromRGB(255,255,255)
 	openButton.Parent = gui
 
-	local strokeBtn = Instance.new("UIStroke")
-	strokeBtn.Color = Color3.fromRGB(170,0,255)
-	strokeBtn.Thickness = 2
-	strokeBtn.Parent = openButton
+	local stroke = Instance.new("UIStroke")
+	stroke.Color = Color3.fromRGB(170,0,255)
+	stroke.Parent = openButton
 
-	-------------------------------------------------
-	-- MAIN MENU
-	-------------------------------------------------
-
+	-- MAIN FRAME
 	local mainFrame = Instance.new("Frame")
-	mainFrame.Size = UDim2.new(0,700,0,500)
+	mainFrame.Size = UDim2.new(0,800,0,500)
 	mainFrame.Position = UDim2.new(0.5,-400,0.5,-250)
 	mainFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
 	mainFrame.BackgroundTransparency = 0.3
@@ -367,13 +322,9 @@ local function createMainGUI()
 
 	local stroke2 = Instance.new("UIStroke")
 	stroke2.Color = Color3.fromRGB(170,0,255)
-	stroke2.Thickness = 2
 	stroke2.Parent = mainFrame
 
-	-------------------------------------------------
 	-- TITLE
-	-------------------------------------------------
-
 	local title = Instance.new("TextLabel")
 	title.Size = UDim2.new(1,0,0,50)
 	title.BackgroundTransparency = 1
@@ -382,16 +333,14 @@ local function createMainGUI()
 	title.TextScaled = true
 	title.Parent = mainFrame
 
-	-------------------------------------------------
-	-- CLOSE / MIN
-	-------------------------------------------------
-
+	-- CLOSE
 	local close = Instance.new("TextButton")
 	close.Size = UDim2.new(0,50,0,50)
 	close.Position = UDim2.new(1,-60,0,5)
 	close.Text = TEXT[LANG].CLOSE
 	close.Parent = mainFrame
 
+	-- MIN
 	local min = Instance.new("TextButton")
 	min.Size = UDim2.new(0,50,0,50)
 	min.Position = UDim2.new(1,-120,0,5)
@@ -399,9 +348,71 @@ local function createMainGUI()
 	min.Parent = mainFrame
 
 	-------------------------------------------------
+	-- NAV BAR
+	-------------------------------------------------
+	local navFrame = Instance.new("Frame")
+	navFrame.Size = UDim2.new(1,0,0,50)
+	navFrame.Position = UDim2.new(0,0,0,60)
+	navFrame.BackgroundTransparency = 1
+	navFrame.Parent = mainFrame
+
+	local layout = Instance.new("UIListLayout")
+	layout.FillDirection = Enum.FillDirection.Horizontal
+	layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	layout.Padding = UDim.new(0,25)
+	layout.Parent = navFrame
+
+	local navButtons = {}
+
+	local function createNav(text)
+
+		local holder = Instance.new("Frame")
+		holder.Size = UDim2.new(0,140,1,0)
+		holder.BackgroundTransparency = 1
+		holder.Parent = navFrame
+
+		local btn = Instance.new("TextButton")
+		btn.Size = UDim2.new(1,0,0.7,0)
+		btn.BackgroundTransparency = 1
+		btn.Text = text
+		btn.TextScaled = true
+		btn.Font = Enum.Font.GothamBold
+		btn.TextColor3 = Color3.fromRGB(170,170,170)
+		btn.Parent = holder
+
+		local line = Instance.new("Frame")
+		line.Size = UDim2.new(1,0,0,3)
+		line.Position = UDim2.new(0,0,1,-3)
+		line.BackgroundColor3 = Color3.fromRGB(170,0,255)
+		line.Visible = false
+		line.Parent = holder
+
+		table.insert(navButtons,{btn=btn,line=line})
+
+		btn.MouseButton1Click:Connect(function()
+
+			for _,v in pairs(navButtons) do
+				v.btn.TextColor3 = Color3.fromRGB(170,170,170)
+				v.line.Visible = false
+			end
+
+			btn.TextColor3 = Color3.fromRGB(255,255,255)
+			line.Visible = true
+
+		end)
+
+		return btn
+	end
+
+	local auto = createNav("AUTO")
+	local playerNav = createNav("PLAYER")
+	local settings = createNav("SETTINGS")
+
+	auto:Activate()
+
+	-------------------------------------------------
 	-- CONFIRM GUI
 	-------------------------------------------------
-
 	local confirm = Instance.new("Frame")
 	confirm.Size = UDim2.new(0,400,0,200)
 	confirm.Position = UDim2.new(0.5,-200,0.5,-100)
@@ -429,138 +440,9 @@ local function createMainGUI()
 	no.Text = "❌ "..TEXT[LANG].NO
 	no.Parent = confirm
 
--------------------------------------------------
--- NAV BAR (BONITA CENTRALIZADA)
--------------------------------------------------
-
-local navFrame = Instance.new("Frame")
-navFrame.Size = UDim2.new(1,0,0,50)
-navFrame.Position = UDim2.new(0,0,0,50)
-navFrame.BackgroundTransparency = 1
-navFrame.Parent = mainFrame
-
--------------------------------------------------
--- LAYOUT CENTRALIZAR
--------------------------------------------------
-
-local navLayout = Instance.new("UIListLayout")
-navLayout.FillDirection = Enum.FillDirection.Horizontal
-navLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-navLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-navLayout.Padding = UDim.new(0,35)
-navLayout.Parent = navFrame
-
-local navButtons = {}
-
--------------------------------------------------
--- PAGE CONTAINER
--------------------------------------------------
-
-local pageContainer = Instance.new("Frame")
-pageContainer.Size = UDim2.new(1,0,1,-100)
-pageContainer.Position = UDim2.new(0,0,0,100)
-pageContainer.BackgroundTransparency = 1
-pageContainer.Parent = mainFrame
-
--------------------------------------------------
--- CREATE PAGES
--------------------------------------------------
-
-local autoPage = Instance.new("Frame")
-autoPage.Size = UDim2.new(1,0,1,0)
-autoPage.BackgroundTransparency = 1
-autoPage.Visible = true
-autoPage.Parent = pageContainer
-
-local playerPage = Instance.new("Frame")
-playerPage.Size = UDim2.new(1,0,1,0)
-playerPage.BackgroundTransparency = 1
-playerPage.Visible = false
-playerPage.Parent = pageContainer
-
-local settingsPage = Instance.new("Frame")
-settingsPage.Size = UDim2.new(1,0,1,0)
-settingsPage.BackgroundTransparency = 1
-settingsPage.Visible = false
-settingsPage.Parent = pageContainer
-
--------------------------------------------------
--- PAGE SWITCH
--------------------------------------------------
-
-local function switchPage(page)
-	autoPage.Visible = false
-	playerPage.Visible = false
-	settingsPage.Visible = false
-	
-	page.Visible = true
-end
-
--------------------------------------------------
--- NAV BUTTON CREATOR
--------------------------------------------------
-
-local function createNavButton(text, page)
-
-	local holder = Instance.new("Frame")
-	holder.Size = UDim2.new(0,160,1,0)
-	holder.BackgroundTransparency = 1
-	holder.Parent = navFrame
-
-	local button = Instance.new("TextButton")
-	button.Size = UDim2.new(1,0,0.7,0)
-	button.BackgroundTransparency = 1
-	button.Text = text
-	button.TextScaled = true
-	button.Font = Enum.Font.GothamBold
-	button.TextColor3 = Color3.fromRGB(170,170,170)
-	button.Parent = holder
-
-	local underline = Instance.new("Frame")
-	underline.Size = UDim2.new(1,0,0,3)
-	underline.Position = UDim2.new(0,0,1,-3)
-	underline.BackgroundColor3 = Color3.fromRGB(170,0,255)
-	underline.Visible = false
-	underline.Parent = holder
-
-	table.insert(navButtons, {btn = button, line = underline, page = page})
-
-	button.MouseButton1Click:Connect(function()
-
-		for _,v in pairs(navButtons) do
-			v.btn.TextColor3 = Color3.fromRGB(170,170,170)
-			v.line.Visible = false
-		end
-
-		button.TextColor3 = Color3.fromRGB(255,255,255)
-		underline.Visible = true
-
-		switchPage(page)
-
-	end)
-
-	return button
-end
-
--------------------------------------------------
--- CREATE NAV BUTTONS
--------------------------------------------------
-
-local autoBtn = createNavButton("AUTO", autoPage)
-local playerBtn = createNavButton("PLAYER", playerPage)
-local settingsBtn = createNavButton("SETTINGS", settingsPage)
-
--------------------------------------------------
--- DEFAULT SELECT AUTO
--------------------------------------------------
-
-autoBtn.TextColor3 = Color3.fromRGB(255,255,255)
-navButtons[1].line.Visible = true
-
 	-------------------------------------------------
 	-- EVENTS
 	-------------------------------------------------
-
 	openButton.MouseButton1Click:Connect(function()
 		mainFrame.Visible = true
 	end)
@@ -583,11 +465,12 @@ navButtons[1].line.Visible = true
 		gui:Destroy()
 		blur.Size = 0
 	end)
-	
--------------------------------------------------
--- LANGUAGE BUTTON EVENTS
--------------------------------------------------
 
+end
+
+-------------------------------------------------
+-- LANGUAGE EVENTS
+-------------------------------------------------
 usaFlag.MouseButton1Click:Connect(function()
 	LANG = "EN"
 	langGui:Destroy()
