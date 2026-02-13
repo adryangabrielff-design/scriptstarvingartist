@@ -214,11 +214,11 @@ gui.Parent = player:WaitForChild("PlayerGui")
 -------------------------------------------------
 local TEXT = {
 	PT = {
-		LANGUAGE = "Qual a sua linguagem?",
+		LANGUAGE = "Português",
 		CLOSE_CONFIRM = "Tem certeza que deseja eliminar o menu?"
 	},
 	EN = {
-		LANGUAGE = "What is your language?",
+		LANGUAGE = "English",
 		CLOSE_CONFIRM = "Are you sure you want to delete the menu?"
 	}
 }
@@ -244,7 +244,7 @@ langText.Size = UDim2.new(1,0,0,60)
 langText.BackgroundTransparency = 1
 langText.TextScaled = true
 langText.TextColor3 = Color3.new(1,1,1)
-langText.Text = "Choose Language"
+langText.Text = "?"
 langText.Parent = langFrame
 
 -------------------------------------------------
