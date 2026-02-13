@@ -4,6 +4,7 @@ local TEXTO_ALVO = "UNCLAIMED"
 --// SERVICES
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
+local VirtualInputManager = game:GetService("VirtualInputManager")
 
 --// PEGAR HRP
 local function getHRP()
@@ -24,7 +25,19 @@ local function getPart(model)
     end
 end
 
---// ACHAR STAND MAIS PERTO COM TEXTO UNCLAIMED
+--// APERTAR TECLA E (FORÇADO)
+local function pressionarE()
+    
+    -- Pressiona
+    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+    task.wait(0.1)
+    
+    -- Solta
+    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+    
+end
+
+--// ACHAR STAND MAIS PERTO COM UNCLAIMED
 local function acharStandMaisPerto(hrp)
 
     local maisPerto = nil
@@ -70,7 +83,7 @@ local function teleportar(part, hrp)
 
 end
 
---// LOOP TELEPORTE
+--// LOOP PRINCIPAL
 task.spawn(function()
 
     while true do
@@ -79,10 +92,22 @@ task.spawn(function()
         local part = acharStandMaisPerto(hrp)
 
         if part then
+            
+            -- TELEPORTA
             teleportar(part, hrp)
+            
+            -- ESPERA UM POUCO PRA CARREGAR
+            task.wait(0.4)
+            
+            -- FORÇA APERTAR E (AUTO CLAIM)
+            for i = 1, 3 do
+                pressionarE()
+                task.wait(0.3)
+            end
+            
         end
 
-        task.wait(0.3)
+        task.wait(0.5)
 
     end
 
