@@ -1,4 +1,4 @@
--- AUTO STAND MENU COMPLETO (TELEPORT RANDOM + AUTO CLAIM CLICKDETECTOR)
+-- AUTO STAND MENU COMPLETO (UNCLAIMED + YOUR TEXT HERE)
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
@@ -13,7 +13,7 @@ local menuAberto = false
 local autoStandAtivo = false
 
 -------------------------------------------------
--- GUI BASE
+-- GUI
 -------------------------------------------------
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "AutoStandMenu"
@@ -23,20 +23,27 @@ screenGui.Parent = player:WaitForChild("PlayerGui")
 -------------------------------------------------
 -- BOTÃO MENU
 -------------------------------------------------
-local toggleButton = Instance.new("TextButton")
+local toggleButton = Instance.new("ImageButton")
 toggleButton.Size = UDim2.new(0,50,0,50)
 toggleButton.Position = UDim2.new(0,20,0,20)
-toggleButton.Text = "☰"
-toggleButton.TextSize = 28
-toggleButton.BackgroundColor3 = Color3.fromRGB(40,40,40)
-toggleButton.TextColor3 = Color3.new(1,1,1)
+toggleButton.BackgroundColor3 = Color3.fromRGB(35,35,35)
+toggleButton.BorderSizePixel = 0
 toggleButton.Parent = screenGui
 
+local toggleIcon = Instance.new("TextLabel")
+toggleIcon.Size = UDim2.new(1,0,1,0)
+toggleIcon.BackgroundTransparency = 1
+toggleIcon.Text = "☰"
+toggleIcon.TextColor3 = Color3.new(1,1,1)
+toggleIcon.TextSize = 30
+toggleIcon.Font = Enum.Font.GothamBold
+toggleIcon.Parent = toggleButton
+
 -------------------------------------------------
--- MENU FRAME
+-- FRAME MENU
 -------------------------------------------------
 local menuFrame = Instance.new("Frame")
-menuFrame.Size = UDim2.new(0,260,0,160)
+menuFrame.Size = UDim2.new(0,260,0,170)
 menuFrame.Position = UDim2.new(0,90,0,20)
 menuFrame.BackgroundColor3 = Color3.fromRGB(25,25,25)
 menuFrame.Visible = false
@@ -44,91 +51,128 @@ menuFrame.Parent = screenGui
 Instance.new("UICorner", menuFrame)
 
 -------------------------------------------------
--- TITULO
+-- TÍTULO
 -------------------------------------------------
-local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1,0,0,35)
-title.BackgroundColor3 = Color3.fromRGB(45,45,45)
-title.Text = "AUTO STAND MENU"
-title.TextColor3 = Color3.new(1,1,1)
-title.Font = Enum.Font.GothamBold
-title.TextSize = 16
-title.Parent = menuFrame
+local menuTitle = Instance.new("TextLabel")
+menuTitle.Size = UDim2.new(1,0,0,35)
+menuTitle.BackgroundColor3 = Color3.fromRGB(45,45,45)
+menuTitle.Text = "AUTO STAND MENU"
+menuTitle.TextColor3 = Color3.new(1,1,1)
+menuTitle.TextSize = 16
+menuTitle.Font = Enum.Font.GothamBold
+menuTitle.Parent = menuFrame
 
 -------------------------------------------------
--- BOTÃO FECHAR
+-- BOTÕES
 -------------------------------------------------
-local close = Instance.new("TextButton")
-close.Size = UDim2.new(0,30,0,25)
-close.Position = UDim2.new(1,-35,0,5)
-close.Text = "X"
-close.BackgroundColor3 = Color3.fromRGB(170,0,0)
-close.TextColor3 = Color3.new(1,1,1)
-close.Parent = menuFrame
-Instance.new("UICorner", close)
+local minimizeButton = Instance.new("TextButton")
+minimizeButton.Size = UDim2.new(0,30,0,25)
+minimizeButton.Position = UDim2.new(1,-70,0,5)
+minimizeButton.Text = "-"
+minimizeButton.BackgroundColor3 = Color3.fromRGB(70,70,70)
+minimizeButton.TextColor3 = Color3.new(1,1,1)
+minimizeButton.Parent = menuFrame
+Instance.new("UICorner", minimizeButton)
+
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0,30,0,25)
+closeButton.Position = UDim2.new(1,-35,0,5)
+closeButton.Text = "X"
+closeButton.BackgroundColor3 = Color3.fromRGB(170,0,0)
+closeButton.TextColor3 = Color3.new(1,1,1)
+closeButton.Parent = menuFrame
+Instance.new("UICorner", closeButton)
 
 -------------------------------------------------
--- AUTO BOTÃO
+-- CONTAINER
 -------------------------------------------------
+local container = Instance.new("Frame")
+container.Size = UDim2.new(1,0,1,-35)
+container.Position = UDim2.new(0,0,0,35)
+container.BackgroundTransparency = 1
+container.Parent = menuFrame
+
+-------------------------------------------------
+-- AUTO FRAME
+-------------------------------------------------
+local autoFrame = Instance.new("Frame")
+autoFrame.Size = UDim2.new(1,-20,0,40)
+autoFrame.Position = UDim2.new(0,10,0,10)
+autoFrame.BackgroundColor3 = Color3.fromRGB(35,35,35)
+autoFrame.Parent = container
+Instance.new("UICorner", autoFrame)
+
+local autoText = Instance.new("TextLabel")
+autoText.Size = UDim2.new(0.5,-5,1,0)
+autoText.Position = UDim2.new(0,10,0,0)
+autoText.BackgroundTransparency = 1
+autoText.Text = "AUTO STAND"
+autoText.TextColor3 = Color3.new(1,1,1)
+autoText.Parent = autoFrame
+
 local autoToggle = Instance.new("TextButton")
-autoToggle.Size = UDim2.new(0.9,0,0,40)
-autoToggle.Position = UDim2.new(0.05,0,0.4,0)
-autoToggle.Text = "AUTO STAND OFF"
+autoToggle.Size = UDim2.new(0.5,-10,0,30)
+autoToggle.Position = UDim2.new(0.5,5,0.5,-15)
+autoToggle.Text = "OFF"
 autoToggle.BackgroundColor3 = Color3.fromRGB(60,60,60)
 autoToggle.TextColor3 = Color3.new(1,1,1)
-autoToggle.Parent = menuFrame
+autoToggle.Parent = autoFrame
 Instance.new("UICorner", autoToggle)
 
+local status = Instance.new("Frame")
+status.Size = UDim2.new(0,10,0,10)
+status.Position = UDim2.new(1,-20,0.5,-5)
+status.BackgroundColor3 = Color3.fromRGB(255,0,0)
+status.BackgroundTransparency = 0.3
+status.Parent = autoFrame
+Instance.new("UICorner", status).CornerRadius = UDim.new(1,0)
+
 -------------------------------------------------
--- TELEPORT FORCE REAL
+-- TELEPORTE FORTE REAL
 -------------------------------------------------
 local function teleportForce(cf)
-	local char = player.Character or player.CharacterAdded:Wait()
 
-	for i = 1, 40 do
-		if char then
-			char:PivotTo(cf + Vector3.new(0,3,0))
-		end
+	local char = player.Character or player.CharacterAdded:Wait()
+	local root = char:WaitForChild("HumanoidRootPart")
+
+	for i = 1, 60 do
+		root.CFrame = cf + Vector3.new(0,4,0)
 		RunService.Heartbeat:Wait()
 	end
+
 end
 
 -------------------------------------------------
--- ACHAR STANDS LIVRES
+-- PEGAR STANDS LIVRES
 -------------------------------------------------
 local function getFreeStands()
 
-	local stands = {}
+	local destinos = {}
 
-	for _, v in pairs(workspace:GetDescendants()) do
-		
-		if v:IsA("BillboardGui") and v.Adornee then
-			
-			local temUnclaimed = false
-			local temYour = false
-			
-			for _, txt in pairs(v:GetDescendants()) do
+	for _, gui in pairs(workspace:GetDescendants()) do
+
+		if gui:IsA("BillboardGui") and gui.Adornee then
+
+			for _, txt in pairs(gui:GetDescendants()) do
+
 				if txt:IsA("TextLabel") or txt:IsA("TextButton") then
-					
+
 					local t = string.upper(txt.Text or "")
-					
-					if t:find("UNCLAIMED") then
-						temUnclaimed = true
+
+					if t:find("UNCLAIMED") or t:find("your text here") then
+						table.insert(destinos, gui.Adornee)
+						break
 					end
-					
-					if t:find("YOUR TEXT HERE") then
-						temYour = true
-					end
+
 				end
+
 			end
-			
-			if temUnclaimed or temYour then
-				table.insert(stands, v.Adornee)
-			end
+
 		end
+
 	end
 
-	return stands
+	return destinos
 end
 
 -------------------------------------------------
@@ -137,45 +181,41 @@ end
 local function autoClaim()
 
 	for _, v in pairs(workspace:GetDescendants()) do
-		
 		if v:IsA("ClickDetector") then
-			
 			pcall(function()
 				fireclickdetector(v)
 			end)
-			
 		end
-		
 	end
 
 end
 
 -------------------------------------------------
--- LOOP AUTO
+-- LOOP AUTO STAND
 -------------------------------------------------
 task.spawn(function()
 
 	while true do
-		task.wait(1)
+		task.wait(2)
 
 		if autoStandAtivo then
-			
+
 			local stands = getFreeStands()
-			
+
 			if #stands > 0 then
-				
+
 				local escolhido = stands[math.random(1,#stands)]
-				
+
 				teleportForce(escolhido.CFrame)
-				
+
 				task.wait(1)
-				
+
 				autoClaim()
-				
+
 			end
-			
+
 		end
-		
+
 	end
 
 end)
@@ -186,26 +226,35 @@ end)
 autoToggle.MouseButton1Click:Connect(function()
 
 	autoStandAtivo = not autoStandAtivo
-	
+
 	if autoStandAtivo then
-		autoToggle.Text = "AUTO STAND ON"
+		autoToggle.Text = "ON"
 		autoToggle.BackgroundColor3 = Color3.fromRGB(0,150,0)
+		status.BackgroundColor3 = Color3.fromRGB(0,255,0)
+		status.BackgroundTransparency = 0
 	else
-		autoToggle.Text = "AUTO STAND OFF"
+		autoToggle.Text = "OFF"
 		autoToggle.BackgroundColor3 = Color3.fromRGB(60,60,60)
+		status.BackgroundColor3 = Color3.fromRGB(255,0,0)
+		status.BackgroundTransparency = 0.3
 	end
 
 end)
 
 -------------------------------------------------
--- MENU BOTÕES
+-- MENU
 -------------------------------------------------
 toggleButton.MouseButton1Click:Connect(function()
 	menuAberto = not menuAberto
 	menuFrame.Visible = menuAberto
 end)
 
-close.MouseButton1Click:Connect(function()
+minimizeButton.MouseButton1Click:Connect(function()
+	menuFrame.Visible = false
+	menuAberto = false
+end)
+
+closeButton.MouseButton1Click:Connect(function()
 	screenGui:Destroy()
 end)
 
