@@ -1,4 +1,4 @@
--- AUTO STAND MENU COMPLETO (ULTRA FORCE FINAL)
+-- AUTO STAND MENU (APENAS UNCLAIMED)
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
@@ -129,49 +129,40 @@ status.Parent = autoFrame
 Instance.new("UICorner", status).CornerRadius = UDim.new(1,0)
 
 -------------------------------------------------
--- TELEPORT FORCE MAX
+-- TELEPORT FORCE
 -------------------------------------------------
 local function teleportForce(cf)
-
 	local char = player.Character or player.CharacterAdded:Wait()
 
-	for i = 1, 40 do
+	for i=1,40 do
 		char:PivotTo(cf + Vector3.new(0,4,0))
 		RunService.Heartbeat:Wait()
 	end
 end
 
 -------------------------------------------------
--- PEGAR DESTINOS (TODOS MÉTODOS)
+-- PEGAR APENAS STANDS UNCLAIMED
 -------------------------------------------------
-local function getDestinos()
+local function getUnclaimedStands()
 
 	local destinos = {}
 
-	-- Método Billboard + Texto
-	for _, v in pairs(workspace:GetDescendants()) do
-		if v:IsA("TextLabel") or v:IsA("TextButton") then
-			if v.Text then
-				local txt = string.upper(v.Text)
+	for _, gui in pairs(workspace:GetDescendants()) do
+		if gui:IsA("BillboardGui") then
 
-				if string.find(txt,"UNCLAIMED") or string.find(txt,"YOUR TEXT HERE") then
+			for _, obj in pairs(gui:GetDescendants()) do
+				if obj:IsA("TextLabel") or obj:IsA("TextButton") then
 
-					local bb = v:FindFirstAncestorWhichIsA("BillboardGui")
-					if bb and bb.Adornee then
-						table.insert(destinos, bb.Adornee.CFrame)
+					local txt = string.upper(obj.Text or "")
+
+					if string.find(txt, "UNCLAIMED") then
+						if gui.Adornee then
+							table.insert(destinos, gui.Adornee.CFrame)
+						end
 					end
 				end
 			end
-		end
-	end
 
-	-- Método Modelo + Part
-	for _, m in pairs(workspace:GetDescendants()) do
-		if m:IsA("Model") then
-			local part = m:FindFirstChildWhichIsA("BasePart", true)
-			if part then
-				table.insert(destinos, part.CFrame)
-			end
 		end
 	end
 
@@ -179,11 +170,11 @@ local function getDestinos()
 end
 
 -------------------------------------------------
--- AUTO CLAIM MAX
+-- AUTO CLAIM
 -------------------------------------------------
 local function autoClaim()
 
-	-- GUI botão
+	-- GUI botão reivindicar
 	local pg = player:FindFirstChild("PlayerGui")
 	if pg then
 		for _, gui in pairs(pg:GetDescendants()) do
@@ -224,10 +215,10 @@ local function autoLoop()
 
 	while autoStandAtivo do
 
-		local destinos = getDestinos()
+		local stands = getUnclaimedStands()
 
-		if #destinos > 0 then
-			local destino = destinos[math.random(1,#destinos)]
+		if #stands > 0 then
+			local destino = stands[math.random(1,#stands)]
 			teleportForce(destino)
 			task.wait(0.5)
 			autoClaim()
