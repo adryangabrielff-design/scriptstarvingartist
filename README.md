@@ -411,3 +411,91 @@ brBtn.MouseButton1Click:Connect(function()
 	langGui:Destroy()
 	createMainGUI()
 end)
+
+-------------------------------------------------
+-- NAV BAR TOP
+-------------------------------------------------
+
+local navBar = Instance.new("Frame")
+navBar.Size = UDim2.new(1,0,0,50)
+navBar.Position = UDim2.new(0,0,0,50)
+navBar.BackgroundTransparency = 1
+navBar.Parent = mainFrame
+
+-------------------------------------------------
+-- PAGE CONTAINER
+-------------------------------------------------
+
+local pageContainer = Instance.new("Frame")
+pageContainer.Size = UDim2.new(1,0,1,-100)
+pageContainer.Position = UDim2.new(0,0,0,100)
+pageContainer.BackgroundTransparency = 1
+pageContainer.Parent = mainFrame
+
+-------------------------------------------------
+-- CREATE PAGES
+-------------------------------------------------
+
+local autoPage = Instance.new("Frame")
+autoPage.Size = UDim2.new(1,0,1,0)
+autoPage.BackgroundTransparency = 1
+autoPage.Visible = true
+autoPage.Parent = pageContainer
+
+local playerPage = Instance.new("Frame")
+playerPage.Size = UDim2.new(1,0,1,0)
+playerPage.BackgroundTransparency = 1
+playerPage.Visible = false
+playerPage.Parent = pageContainer
+
+local settingsPage = Instance.new("Frame")
+settingsPage.Size = UDim2.new(1,0,1,0)
+settingsPage.BackgroundTransparency = 1
+settingsPage.Visible = false
+settingsPage.Parent = pageContainer
+
+-------------------------------------------------
+-- PAGE SWITCH FUNCTION
+-------------------------------------------------
+
+local function switchPage(page)
+	autoPage.Visible = false
+	playerPage.Visible = false
+	settingsPage.Visible = false
+	
+	page.Visible = true
+end
+
+-------------------------------------------------
+-- NAV BUTTON CREATOR
+-------------------------------------------------
+
+local function createNavButton(text, posX, page)
+
+	local btn = Instance.new("TextButton")
+	btn.Size = UDim2.new(0,150,0,40)
+	btn.Position = UDim2.new(0,posX,0,5)
+	btn.BackgroundColor3 = Color3.fromRGB(0,0,0)
+	btn.TextColor3 = Color3.fromRGB(255,255,255)
+	btn.TextScaled = true
+	btn.Text = text
+	btn.Parent = navBar
+
+	local stroke = Instance.new("UIStroke")
+	stroke.Color = Color3.fromRGB(170,0,255)
+	stroke.Thickness = 2
+	stroke.Parent = btn
+
+	btn.MouseButton1Click:Connect(function()
+		switchPage(page)
+	end)
+
+end
+
+-------------------------------------------------
+-- CREATE NAV BUTTONS
+-------------------------------------------------
+
+createNavButton("AUTO", 20, autoPage)
+createNavButton("PLAYER", 190, playerPage)
+createNavButton("SETTINGS", 360, settingsPage)
