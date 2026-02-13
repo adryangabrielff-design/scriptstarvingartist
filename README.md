@@ -1,5 +1,6 @@
 --// CONFIG
 local TEXTO_ALVO = "UNCLAIMED"
+local TEMPO_LOOP = 2 -- segundos
 
 --// SERVICES
 local Players = game:GetService("Players")
@@ -58,7 +59,6 @@ end
 -- CLICAR BOTÃO CLAIM GUI
 -------------------------------------------------
 local function clicarBotao()
-
     for _, gui in pairs(player.PlayerGui:GetDescendants()) do
         
         if gui:IsA("TextButton") or gui:IsA("ImageButton") then
@@ -78,18 +78,15 @@ local function clicarBotao()
                 pcall(function()
                     gui.MouseButton1Click:Fire()
                 end)
-                
             end
         end
     end
-
 end
 
 -------------------------------------------------
 -- ATIVAR CLICK DETECTOR
 -------------------------------------------------
 local function ativarClickDetector(model)
-
     for _, v in pairs(model:GetDescendants()) do
         if v:IsA("ClickDetector") then
             pcall(function()
@@ -97,7 +94,6 @@ local function ativarClickDetector(model)
             end)
         end
     end
-
 end
 
 -------------------------------------------------
@@ -138,24 +134,24 @@ local function acharStand(hrp)
 end
 
 -------------------------------------------------
--- TELEPORTE DEMÔNIO (TRAVA PLAYER NO STAND)
+-- TELEPORTE DEMÔNIO
 -------------------------------------------------
 local function teleportarDemonio(part, hrp)
-
     for i = 1, 25 do
         hrp.CFrame = part.CFrame + Vector3.new(0,3,0)
         hrp.AssemblyLinearVelocity = Vector3.zero
         task.wait(0.01)
     end
-
 end
 
 -------------------------------------------------
--- LOOP DEMÔNIO
+-- LOOP COM TEMPO LIMITE
 -------------------------------------------------
 task.spawn(function()
 
-    while true do
+    local inicio = tick()
+
+    while tick() - inicio <= TEMPO_LOOP do
         
         local hrp = getHRP()
         local standModel = acharStand(hrp)
@@ -166,20 +162,13 @@ task.spawn(function()
             
             if part then
                 
-                -- TELEPORTE INSANO
                 teleportarDemonio(part, hrp)
-                
-                -- ATIVA CLICK DETECTOR
                 ativarClickDetector(standModel)
                 
-                -- SPAM INTERAÇÃO
                 spamE(20)
                 spamMouse(20)
-                
-                -- BOTÃO GUI
                 clicarBotao()
                 
-                -- MAIS SPAM
                 spamE(10)
                 spamMouse(10)
                 
@@ -189,5 +178,7 @@ task.spawn(function()
         task.wait(0.2)
 
     end
+
+    print("🔥 Loop demônio finalizado 🔥")
 
 end)
