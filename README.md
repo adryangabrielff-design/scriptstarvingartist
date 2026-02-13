@@ -1,4 +1,4 @@
--- AUTO STAND MENU COMPLETO (UNCLAIMED + YOUR TEXT HERE + AUTO CLAIM)
+-- AUTO STAND MENU COMPLETO (FUNCIONAL + AUTO CLAIM SEGURO)
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
@@ -128,21 +128,22 @@ status.Parent = autoFrame
 Instance.new("UICorner", status).CornerRadius = UDim.new(1,0)
 
 -------------------------------------------------
--- TELEPORTE FORÇADO
+-- TELEPORTE
 -------------------------------------------------
 local function teleportForce(cf)
 
 	local char = player.Character or player.CharacterAdded:Wait()
-	local hrp = char:WaitForChild("HumanoidRootPart")
 
-	for i = 1, 30 do
-		char:PivotTo(cf + Vector3.new(0,3,0))
-		RunService.Heartbeat:Wait()
+	for i = 1, 20 do
+		if char then
+			char:PivotTo(cf + Vector3.new(0,3,0))
+		end
+		task.wait()
 	end
 end
 
 -------------------------------------------------
--- AUTO CLAIM (NOVO)
+-- AUTO CLAIM SIMPLES
 -------------------------------------------------
 local function autoClaim()
 
@@ -152,28 +153,14 @@ local function autoClaim()
 	local hrp = char:FindFirstChild("HumanoidRootPart")
 	if not hrp then return end
 
-	for i = 1, 20 do
-
-		-- ProximityPrompt
-		for _, v in pairs(workspace:GetDescendants()) do
-			if v:IsA("ProximityPrompt") then
-				if (v.Parent.Position - hrp.Position).Magnitude < 15 then
+	for _, v in pairs(workspace:GetDescendants()) do
+		if v:IsA("ProximityPrompt") then
+			if (v.Parent.Position - hrp.Position).Magnitude < 15 then
+				pcall(function()
 					fireproximityprompt(v)
-				end
+				end)
 			end
 		end
-
-		-- Touch Claim
-		for _, part in pairs(workspace:GetDescendants()) do
-			if part:IsA("BasePart") then
-				if (part.Position - hrp.Position).Magnitude < 8 then
-					firetouchinterest(hrp, part, 0)
-					firetouchinterest(hrp, part, 1)
-				end
-			end
-		end
-
-		RunService.Heartbeat:Wait()
 	end
 end
 
@@ -207,9 +194,7 @@ local function autoStand()
 		local destino = destinos[math.random(1, #destinos)]
 
 		teleportForce(destino)
-
-		task.wait(0.3)
-
+		task.wait(0.5)
 		autoClaim()
 	end
 end
