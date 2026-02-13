@@ -201,7 +201,7 @@ gui.Parent = player:WaitForChild("PlayerGui")
 -------------------------------------------------
 local openButton = Instance.new("TextButton")
 openButton.Size = UDim2.new(0,60,0,60)
-openButton.Position = UDim2.new(0,20,0,100) -- MAIS PRA CIMA
+openButton.Position = UDim2.new(0,20,0,200) -- MAIS PRA CIMA
 openButton.BackgroundColor3 = Color3.fromRGB(0,0,0)
 openButton.Text = "⚠️"
 openButton.TextScaled = false
