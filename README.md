@@ -1,4 +1,4 @@
--- AUTO STAND MENU COMPLETO (UNCLAIMED + YOUR TEXT HERE)
+-- AUTO STAND MENU COMPLETO (MODEL STANDS FIX)
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
@@ -40,7 +40,7 @@ toggleIcon.Font = Enum.Font.GothamBold
 toggleIcon.Parent = toggleButton
 
 -------------------------------------------------
--- FRAME MENU
+-- MENU FRAME
 -------------------------------------------------
 local menuFrame = Instance.new("Frame")
 menuFrame.Size = UDim2.new(0,260,0,170)
@@ -51,7 +51,7 @@ menuFrame.Parent = screenGui
 Instance.new("UICorner", menuFrame)
 
 -------------------------------------------------
--- TÍTULO
+-- TITULO
 -------------------------------------------------
 local menuTitle = Instance.new("TextLabel")
 menuTitle.Size = UDim2.new(1,0,0,35)
@@ -84,74 +84,52 @@ closeButton.Parent = menuFrame
 Instance.new("UICorner", closeButton)
 
 -------------------------------------------------
--- CONTAINER
+-- AUTO TOGGLE
 -------------------------------------------------
-local container = Instance.new("Frame")
-container.Size = UDim2.new(1,0,1,-35)
-container.Position = UDim2.new(0,0,0,35)
-container.BackgroundTransparency = 1
-container.Parent = menuFrame
-
--------------------------------------------------
--- AUTO FRAME
--------------------------------------------------
-local autoFrame = Instance.new("Frame")
-autoFrame.Size = UDim2.new(1,-20,0,40)
-autoFrame.Position = UDim2.new(0,10,0,10)
-autoFrame.BackgroundColor3 = Color3.fromRGB(35,35,35)
-autoFrame.Parent = container
-Instance.new("UICorner", autoFrame)
-
-local autoText = Instance.new("TextLabel")
-autoText.Size = UDim2.new(0.5,-5,1,0)
-autoText.Position = UDim2.new(0,10,0,0)
-autoText.BackgroundTransparency = 1
-autoText.Text = "AUTO STAND"
-autoText.TextColor3 = Color3.new(1,1,1)
-autoText.Parent = autoFrame
-
 local autoToggle = Instance.new("TextButton")
-autoToggle.Size = UDim2.new(0.5,-10,0,30)
-autoToggle.Position = UDim2.new(0.5,5,0.5,-15)
-autoToggle.Text = "OFF"
+autoToggle.Size = UDim2.new(0.8,0,0,35)
+autoToggle.Position = UDim2.new(0.1,0,0.5,0)
+autoToggle.Text = "AUTO OFF"
 autoToggle.BackgroundColor3 = Color3.fromRGB(60,60,60)
 autoToggle.TextColor3 = Color3.new(1,1,1)
-autoToggle.Parent = autoFrame
+autoToggle.Parent = menuFrame
 Instance.new("UICorner", autoToggle)
 
-local status = Instance.new("Frame")
-status.Size = UDim2.new(0,10,0,10)
-status.Position = UDim2.new(1,-20,0.5,-5)
-status.BackgroundColor3 = Color3.fromRGB(255,0,0)
-status.BackgroundTransparency = 0.3
-status.Parent = autoFrame
-Instance.new("UICorner", status).CornerRadius = UDim.new(1,0)
-
 -------------------------------------------------
--- TELEPORTE FORTE REAL
+-- TELEPORT FORTE MODEL
 -------------------------------------------------
-local function teleportForce(cf)
+local function teleportModel(model)
 
 	local char = player.Character or player.CharacterAdded:Wait()
 	local root = char:WaitForChild("HumanoidRootPart")
 
-	for i = 1, 60 do
-		root.CFrame = cf + Vector3.new(0,4,0)
+	local cf
+
+	if model.PrimaryPart then
+		cf = model.PrimaryPart.CFrame
+	else
+		cf = model:GetPivot()
+	end
+
+	for i = 1, 80 do
+		root.CFrame = cf + Vector3.new(0,5,0)
 		RunService.Heartbeat:Wait()
 	end
 
 end
 
 -------------------------------------------------
--- PEGAR STANDS LIVRES
+-- PEGAR MODELS STAND LIVRES
 -------------------------------------------------
-local function getFreeStands()
+local function getFreeStandModels()
 
-	local destinos = {}
+	local modelos = {}
 
 	for _, gui in pairs(workspace:GetDescendants()) do
 
 		if gui:IsA("BillboardGui") and gui.Adornee then
+
+			local temLivre = false
 
 			for _, txt in pairs(gui:GetDescendants()) do
 
@@ -159,8 +137,8 @@ local function getFreeStands()
 
 					local t = string.upper(txt.Text or "")
 
-					if t:find("UNCLAIMED") or t:find("your text here") then
-						table.insert(destinos, gui.Adornee)
+					if t:find("UNCLAIMED") or t:find("YOUR TEXT HERE") then
+						temLivre = true
 						break
 					end
 
@@ -168,11 +146,18 @@ local function getFreeStands()
 
 			end
 
+			if temLivre then
+				local model = gui.Adornee:FindFirstAncestorOfClass("Model")
+				if model then
+					table.insert(modelos, model)
+				end
+			end
+
 		end
 
 	end
 
-	return destinos
+	return modelos
 end
 
 -------------------------------------------------
@@ -191,7 +176,7 @@ local function autoClaim()
 end
 
 -------------------------------------------------
--- LOOP AUTO STAND
+-- LOOP AUTO
 -------------------------------------------------
 task.spawn(function()
 
@@ -200,13 +185,13 @@ task.spawn(function()
 
 		if autoStandAtivo then
 
-			local stands = getFreeStands()
+			local stands = getFreeStandModels()
 
 			if #stands > 0 then
 
 				local escolhido = stands[math.random(1,#stands)]
 
-				teleportForce(escolhido.CFrame)
+				teleportModel(escolhido)
 
 				task.wait(1)
 
@@ -228,15 +213,11 @@ autoToggle.MouseButton1Click:Connect(function()
 	autoStandAtivo = not autoStandAtivo
 
 	if autoStandAtivo then
-		autoToggle.Text = "ON"
+		autoToggle.Text = "AUTO ON"
 		autoToggle.BackgroundColor3 = Color3.fromRGB(0,150,0)
-		status.BackgroundColor3 = Color3.fromRGB(0,255,0)
-		status.BackgroundTransparency = 0
 	else
-		autoToggle.Text = "OFF"
+		autoToggle.Text = "AUTO OFF"
 		autoToggle.BackgroundColor3 = Color3.fromRGB(60,60,60)
-		status.BackgroundColor3 = Color3.fromRGB(255,0,0)
-		status.BackgroundTransparency = 0.3
 	end
 
 end)
