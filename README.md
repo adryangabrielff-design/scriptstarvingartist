@@ -144,11 +144,40 @@ status.Parent = autoFrame
 Instance.new("UICorner", status).CornerRadius = UDim.new(1,0)
 
 -------------------------------------------------
--- FUNÇÃO AUTO STAND (PLACEHOLDER)
+-- FUNÇÃO AUTO STAND (COM TELEPORTE UNCLAIMED)
 -------------------------------------------------
 local function autoStand()
 	if not autoStandAtivo then return end
-	print("Auto Stand Ativo (placeholder)")
+	
+	local character = player.Character or player.CharacterAdded:Wait()
+	local hrp = character:WaitForChild("HumanoidRootPart")
+
+	local standsUnclaimed = {}
+
+	for _, obj in pairs(workspace:GetDescendants()) do
+		if obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("SurfaceGui") then
+			
+			local textObj = obj:FindFirstChildOfClass("TextLabel") or obj
+			
+			if textObj and textObj.Text then
+				if string.find(string.upper(textObj.Text), "UNCLAIMED") then
+					
+					local part = obj:FindFirstAncestorWhichIsA("BasePart")
+					if part then
+						table.insert(standsUnclaimed, part)
+					end
+				end
+			end
+		end
+	end
+
+	if #standsUnclaimed > 0 then
+		local escolhido = standsUnclaimed[math.random(1, #standsUnclaimed)]
+		hrp.CFrame = escolhido.CFrame + Vector3.new(0,3,0)
+		print("Teleportado para stand UNCLAIMED")
+	else
+		warn("Nenhum stand UNCLAIMED encontrado")
+	end
 end
 
 -------------------------------------------------
