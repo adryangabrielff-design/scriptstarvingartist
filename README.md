@@ -1,8 +1,9 @@
--- AUTO STAND MENU COMPLETO (TELEPORTE + AUTO CLAIM)
+-- AUTO STAND MENU COMPLETO (UNCLAIMED + YOUR TEXT HERE + AUTO CLAIM)
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
+
 local player = Players.LocalPlayer
 
 -------------------------------------------------
@@ -26,6 +27,7 @@ local toggleButton = Instance.new("ImageButton")
 toggleButton.Size = UDim2.new(0,50,0,50)
 toggleButton.Position = UDim2.new(0,20,0,20)
 toggleButton.BackgroundColor3 = Color3.fromRGB(35,35,35)
+toggleButton.BorderSizePixel = 0
 toggleButton.Parent = screenGui
 
 local toggleIcon = Instance.new("TextLabel")
@@ -38,7 +40,7 @@ toggleIcon.Font = Enum.Font.GothamBold
 toggleIcon.Parent = toggleButton
 
 -------------------------------------------------
--- MENU FRAME
+-- FRAME MENU
 -------------------------------------------------
 local menuFrame = Instance.new("Frame")
 menuFrame.Size = UDim2.new(0,260,0,170)
@@ -49,7 +51,40 @@ menuFrame.Parent = screenGui
 Instance.new("UICorner", menuFrame)
 
 -------------------------------------------------
--- AUTO FRAME
+-- TÍTULO
+-------------------------------------------------
+local menuTitle = Instance.new("TextLabel")
+menuTitle.Size = UDim2.new(1,0,0,35)
+menuTitle.BackgroundColor3 = Color3.fromRGB(45,45,45)
+menuTitle.Text = "AUTO STAND MENU"
+menuTitle.TextColor3 = Color3.new(1,1,1)
+menuTitle.TextSize = 16
+menuTitle.Font = Enum.Font.GothamBold
+menuTitle.Parent = menuFrame
+
+-------------------------------------------------
+-- BOTÕES
+-------------------------------------------------
+local minimizeButton = Instance.new("TextButton")
+minimizeButton.Size = UDim2.new(0,30,0,25)
+minimizeButton.Position = UDim2.new(1,-70,0,5)
+minimizeButton.Text = "-"
+minimizeButton.BackgroundColor3 = Color3.fromRGB(70,70,70)
+minimizeButton.TextColor3 = Color3.new(1,1,1)
+minimizeButton.Parent = menuFrame
+Instance.new("UICorner", minimizeButton)
+
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0,30,0,25)
+closeButton.Position = UDim2.new(1,-35,0,5)
+closeButton.Text = "X"
+closeButton.BackgroundColor3 = Color3.fromRGB(170,0,0)
+closeButton.TextColor3 = Color3.new(1,1,1)
+closeButton.Parent = menuFrame
+Instance.new("UICorner", closeButton)
+
+-------------------------------------------------
+-- CONTAINER
 -------------------------------------------------
 local container = Instance.new("Frame")
 container.Size = UDim2.new(1,0,1,-35)
@@ -57,12 +92,23 @@ container.Position = UDim2.new(0,0,0,35)
 container.BackgroundTransparency = 1
 container.Parent = menuFrame
 
+-------------------------------------------------
+-- AUTO FRAME
+-------------------------------------------------
 local autoFrame = Instance.new("Frame")
 autoFrame.Size = UDim2.new(1,-20,0,40)
 autoFrame.Position = UDim2.new(0,10,0,10)
 autoFrame.BackgroundColor3 = Color3.fromRGB(35,35,35)
 autoFrame.Parent = container
 Instance.new("UICorner", autoFrame)
+
+local autoText = Instance.new("TextLabel")
+autoText.Size = UDim2.new(0.5,-5,1,0)
+autoText.Position = UDim2.new(0,10,0,0)
+autoText.BackgroundTransparency = 1
+autoText.Text = "AUTO STAND"
+autoText.TextColor3 = Color3.new(1,1,1)
+autoText.Parent = autoFrame
 
 local autoToggle = Instance.new("TextButton")
 autoToggle.Size = UDim2.new(0.5,-10,0,30)
@@ -87,17 +133,16 @@ Instance.new("UICorner", status).CornerRadius = UDim.new(1,0)
 local function teleportForce(cf)
 
 	local char = player.Character or player.CharacterAdded:Wait()
+	local hrp = char:WaitForChild("HumanoidRootPart")
 
 	for i = 1, 30 do
-		if char then
-			char:PivotTo(cf + Vector3.new(0,3,0))
-		end
+		char:PivotTo(cf + Vector3.new(0,3,0))
 		RunService.Heartbeat:Wait()
 	end
 end
 
 -------------------------------------------------
--- AUTO CLAIM
+-- AUTO CLAIM (NOVO)
 -------------------------------------------------
 local function autoClaim()
 
@@ -107,23 +152,28 @@ local function autoClaim()
 	local hrp = char:FindFirstChild("HumanoidRootPart")
 	if not hrp then return end
 
-	-- tenta proximity prompt
-	for _, v in pairs(workspace:GetDescendants()) do
-		if v:IsA("ProximityPrompt") then
-			if (v.Parent.Position - hrp.Position).Magnitude < 15 then
-				fireproximityprompt(v)
-			end
-		end
-	end
+	for i = 1, 20 do
 
-	-- tenta touch claim
-	for _, part in pairs(workspace:GetDescendants()) do
-		if part:IsA("BasePart") then
-			if (part.Position - hrp.Position).Magnitude < 10 then
-				firetouchinterest(hrp, part, 0)
-				firetouchinterest(hrp, part, 1)
+		-- ProximityPrompt
+		for _, v in pairs(workspace:GetDescendants()) do
+			if v:IsA("ProximityPrompt") then
+				if (v.Parent.Position - hrp.Position).Magnitude < 15 then
+					fireproximityprompt(v)
+				end
 			end
 		end
+
+		-- Touch Claim
+		for _, part in pairs(workspace:GetDescendants()) do
+			if part:IsA("BasePart") then
+				if (part.Position - hrp.Position).Magnitude < 8 then
+					firetouchinterest(hrp, part, 0)
+					firetouchinterest(hrp, part, 1)
+				end
+			end
+		end
+
+		RunService.Heartbeat:Wait()
 	end
 end
 
@@ -144,9 +194,9 @@ local function autoStand()
 
 				if string.find(txt, "UNCLAIMED") or string.find(txt, "YOUR TEXT HERE") then
 					
-					local gui = v:FindFirstAncestorOfClass("BillboardGui")
-					if gui and gui.Adornee then
-						table.insert(destinos, gui.Adornee.CFrame)
+					local adornee = v.Parent
+					if adornee and adornee:IsA("BillboardGui") and adornee.Adornee then
+						table.insert(destinos, adornee.Adornee.CFrame)
 					end
 				end
 			end
@@ -155,9 +205,11 @@ local function autoStand()
 
 	if #destinos > 0 then
 		local destino = destinos[math.random(1, #destinos)]
+
 		teleportForce(destino)
 
-		task.wait(0.5)
+		task.wait(0.3)
+
 		autoClaim()
 	end
 end
@@ -190,6 +242,15 @@ end)
 toggleButton.MouseButton1Click:Connect(function()
 	menuAberto = not menuAberto
 	menuFrame.Visible = menuAberto
+end)
+
+minimizeButton.MouseButton1Click:Connect(function()
+	menuFrame.Visible = false
+	menuAberto = false
+end)
+
+closeButton.MouseButton1Click:Connect(function()
+	screenGui:Destroy()
 end)
 
 -------------------------------------------------
