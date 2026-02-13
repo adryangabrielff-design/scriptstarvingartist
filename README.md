@@ -1,4 +1,4 @@
--- AUTO STAND MENU COMPLETO (FUNCIONAL + AUTO CLAIM SEGURO)
+-- AUTO STAND MENU COMPLETO (NOVO AUTO CLAIM + LOOP)
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
@@ -128,24 +128,22 @@ status.Parent = autoFrame
 Instance.new("UICorner", status).CornerRadius = UDim.new(1,0)
 
 -------------------------------------------------
--- TELEPORTE
+-- TELEPORT FORCE
 -------------------------------------------------
 local function teleportForce(cf)
-
 	local char = player.Character or player.CharacterAdded:Wait()
 
-	for i = 1, 20 do
+	for i = 1, 25 do
 		if char then
 			char:PivotTo(cf + Vector3.new(0,3,0))
 		end
-		task.wait()
+		RunService.Heartbeat:Wait()
 	end
 end
 
 -------------------------------------------------
--- AUTO CLAIM + TELEPORT LOOP
+-- AUTO LOOP (NOVO)
 -------------------------------------------------
-
 task.spawn(function()
 
 	while true do
@@ -157,17 +155,14 @@ task.spawn(function()
 
 			for _, v in pairs(workspace:GetDescendants()) do
 
-				-------------------------------------------------
-				-- ACHAR STANDS UNCLAIMED
-				-------------------------------------------------
+				-- ACHAR STANDS
 				if v:IsA("TextLabel") or v:IsA("TextButton") then
-
 					if v.Text then
 						local txt = string.upper(v.Text)
 
-						if string.find(txt, "UNCLAIMED")
-						or string.find(txt, "YOUR TEXT HERE")
-						or string.find(txt, "ESTANTE") then
+						if txt:find("UNCLAIMED")
+						or txt:find("YOUR TEXT HERE")
+						or txt:find("ESTANTE") then
 
 							local adornee = v.Parent
 							if adornee and adornee:IsA("BillboardGui") and adornee.Adornee then
@@ -177,12 +172,9 @@ task.spawn(function()
 					end
 				end
 
-				-------------------------------------------------
-				-- AUTO CLICAR REIVINDICAR
-				-------------------------------------------------
-				if v:IsA("TextButton") then
-
-					if v.Text and string.find(string.upper(v.Text), "REIVINDICAR") then
+				-- CLICAR REIVINDICAR
+				if v:IsA("TextButton") and v.Text then
+					if string.upper(v.Text):find("REIVINDICAR") then
 
 						pcall(function()
 							v:Activate()
@@ -197,9 +189,7 @@ task.spawn(function()
 
 			end
 
-			-------------------------------------------------
 			-- TELEPORTAR
-			-------------------------------------------------
 			if #destinos > 0 then
 				local destino = destinos[math.random(1,#destinos)]
 				teleportForce(destino)
@@ -223,7 +213,6 @@ autoToggle.MouseButton1Click:Connect(function()
 		autoToggle.BackgroundColor3 = Color3.fromRGB(0,150,0)
 		status.BackgroundColor3 = Color3.fromRGB(0,255,0)
 		status.BackgroundTransparency = 0
-		autoStand()
 	else
 		autoToggle.Text = "OFF"
 		autoToggle.BackgroundColor3 = Color3.fromRGB(60,60,60)
@@ -234,7 +223,7 @@ autoToggle.MouseButton1Click:Connect(function()
 end)
 
 -------------------------------------------------
--- MENU
+-- MENU CONTROLES
 -------------------------------------------------
 toggleButton.MouseButton1Click:Connect(function()
 	menuAberto = not menuAberto
