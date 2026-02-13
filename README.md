@@ -6,13 +6,17 @@ local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local VirtualInputManager = game:GetService("VirtualInputManager")
 
---// PEGAR HRP
+-------------------------------------------------
+-- HRP
+-------------------------------------------------
 local function getHRP()
     local char = player.Character or player.CharacterAdded:Wait()
     return char:WaitForChild("HumanoidRootPart")
 end
 
---// PEGAR QUALQUER PART DO MODEL
+-------------------------------------------------
+-- PEGAR PART DO MODEL
+-------------------------------------------------
 local function getPart(model)
     if model.PrimaryPart then
         return model.PrimaryPart
@@ -25,20 +29,52 @@ local function getPart(model)
     end
 end
 
---// APERTAR TECLA E (FORÇADO)
-local function pressionarE()
-    
-    -- Pressiona
-    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
-    task.wait(0.1)
-    
-    -- Solta
-    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
-    
+-------------------------------------------------
+-- SPAM TECLA E
+-------------------------------------------------
+local function spamE(vezes)
+    for i = 1, vezes do
+        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+        task.wait(0.05)
+        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+        task.wait(0.05)
+    end
 end
 
---// ACHAR STAND MAIS PERTO COM UNCLAIMED
-local function acharStandMaisPerto(hrp)
+-------------------------------------------------
+-- CLICAR BOTÃO REIVINDICAR (SE EXISTIR)
+-------------------------------------------------
+local function clicarBotaoReivindicar()
+
+    for _, gui in pairs(player.PlayerGui:GetDescendants()) do
+        
+        if gui:IsA("TextButton") or gui:IsA("ImageButton") then
+            
+            local nome = string.upper(gui.Name or "")
+            local texto = string.upper(gui.Text or "")
+            
+            if string.find(nome, "REIVIND") 
+            or string.find(texto, "REIVIND")
+            or string.find(texto, "CLAIM") then
+                
+                pcall(function()
+                    gui:Activate()
+                end)
+                
+                pcall(function()
+                    gui.MouseButton1Click:Fire()
+                end)
+                
+            end
+        end
+    end
+
+end
+
+-------------------------------------------------
+-- ACHAR STAND MAIS PERTO
+-------------------------------------------------
+local function acharStand(hrp)
 
     local maisPerto = nil
     local distMin = math.huge
@@ -72,42 +108,49 @@ local function acharStandMaisPerto(hrp)
     return maisPerto
 end
 
---// TELEPORTE SUPER FORÇADO
-local function teleportar(part, hrp)
+-------------------------------------------------
+-- TELEPORTE INSANO
+-------------------------------------------------
+local function teleportarInsano(part, hrp)
 
-    for i = 1, 5 do
+    for i = 1, 10 do
         hrp.CFrame = part.CFrame + Vector3.new(0,3,0)
-        hrp.AssemblyLinearVelocity = Vector3.new(0,0,0)
-        task.wait(0.05)
+        hrp.AssemblyLinearVelocity = Vector3.zero
+        task.wait(0.03)
     end
 
 end
 
---// LOOP PRINCIPAL
+-------------------------------------------------
+-- LOOP INSANO
+-------------------------------------------------
 task.spawn(function()
 
     while true do
         
         local hrp = getHRP()
-        local part = acharStandMaisPerto(hrp)
+        local part = acharStand(hrp)
 
         if part then
             
-            -- TELEPORTA
-            teleportar(part, hrp)
+            -- TELEPORTE
+            teleportarInsano(part, hrp)
             
-            -- ESPERA UM POUCO PRA CARREGAR
-            task.wait(0.4)
+            -- ESPERA
+            task.wait(0.2)
             
-            -- FORÇA APERTAR E (AUTO CLAIM)
-            for i = 1, 3 do
-                pressionarE()
-                task.wait(0.3)
-            end
+            -- SPAM TECLA E
+            spamE(10)
+            
+            -- TENTA CLICAR BOTÃO
+            clicarBotaoReivindicar()
+            
+            -- MAIS SPAM E
+            spamE(5)
             
         end
 
-        task.wait(0.5)
+        task.wait(0.3)
 
     end
 
