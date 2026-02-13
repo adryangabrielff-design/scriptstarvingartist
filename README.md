@@ -197,14 +197,15 @@ gui.ResetOnSpawn = false
 gui.Parent = player:WaitForChild("PlayerGui")
 
 -------------------------------------------------
--- BOTÃO ⚠️
+-- BOTÃO ⚠️ (MAIS PRA CIMA + EMOJI MENOR)
 -------------------------------------------------
 local openButton = Instance.new("TextButton")
 openButton.Size = UDim2.new(0,60,0,60)
-openButton.Position = UDim2.new(0,20,0,50)
+openButton.Position = UDim2.new(0,20,0,40) -- MAIS PRA CIMA
 openButton.BackgroundColor3 = Color3.fromRGB(0,0,0)
 openButton.Text = "⚠️"
-openButton.TextScaled = true
+openButton.TextScaled = false
+openButton.TextSize = 28 -- EMOJI MENOR
 openButton.TextColor3 = Color3.fromRGB(255,255,255)
 openButton.Parent = gui
 
@@ -219,11 +220,11 @@ cornerBtn.CornerRadius = UDim.new(0,12)
 cornerBtn.Parent = openButton
 
 -------------------------------------------------
--- MENU GRANDE
+-- MENU GRANDE (AUMENTADO)
 -------------------------------------------------
 local menu = Instance.new("Frame")
-menu.Size = UDim2.new(0.6,0,0.7,0)
-menu.Position = UDim2.new(0.2,0,0.15,0)
+menu.Size = UDim2.new(0.8,0,0.8,0) -- MAIOR
+menu.Position = UDim2.new(0.1,0,0.1,0)
 menu.BackgroundColor3 = Color3.fromRGB(0,0,0)
 menu.BackgroundTransparency = 0.35
 menu.Visible = false
@@ -243,8 +244,8 @@ cornerMenu.Parent = menu
 -- BOTÃO FECHAR (-)
 -------------------------------------------------
 local minimize = Instance.new("TextButton")
-minimize.Size = UDim2.new(0,50,0,40)
-minimize.Position = UDim2.new(1,-120,0,20)
+minimize.Size = UDim2.new(0,60,0,45)
+minimize.Position = UDim2.new(1,-140,0,20)
 minimize.BackgroundColor3 = Color3.fromRGB(40,40,40)
 minimize.Text = "-"
 minimize.TextScaled = true
@@ -262,8 +263,8 @@ Instance.new("UICorner", minimize)
 -- BOTÃO X (DESTRUIR)
 -------------------------------------------------
 local close = Instance.new("TextButton")
-close.Size = UDim2.new(0,50,0,40)
-close.Position = UDim2.new(1,-60,0,20)
+close.Size = UDim2.new(0,60,0,45)
+close.Position = UDim2.new(1,-70,0,20)
 close.BackgroundColor3 = Color3.fromRGB(120,0,0)
 close.Text = "X"
 close.TextScaled = true
@@ -295,4 +296,3 @@ end)
 close.MouseButton1Click:Connect(function()
 	gui:Destroy()
 end)
-
