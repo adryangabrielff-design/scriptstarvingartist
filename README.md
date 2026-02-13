@@ -1,6 +1,6 @@
 --// CONFIG
 local TEXTO_ALVO = "UNCLAIMED"
-local TEMPO_LOOP = 2 -- segundos
+local TEMPO_LOOP = 1 -- segundos
 
 --// SERVICES
 local Players = game:GetService("Players")
