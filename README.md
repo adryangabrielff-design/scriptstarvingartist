@@ -183,16 +183,12 @@ task.spawn(function()
 
 end)
 
---// SERVICES
+-- SERVICES
 local Players = game:GetService("Players")
 local Lighting = game:GetService("Lighting")
 
 local player = Players.LocalPlayer
-
--------------------------------------------------
--- IDIOMA
--------------------------------------------------
-local LANG = "PT" -- padrão
+local PlayerGui = player:WaitForChild("PlayerGui")
 
 -------------------------------------------------
 -- BLUR
@@ -202,223 +198,216 @@ blur.Size = 0
 blur.Parent = Lighting
 
 -------------------------------------------------
--- GUI BASE
+-- LANGUAGE VARIABLES
 -------------------------------------------------
-local gui = Instance.new("ScreenGui")
-gui.Name = "PurpleMenuSystem"
-gui.ResetOnSpawn = false
-gui.Parent = player:WaitForChild("PlayerGui")
+local LANG = "PT"
 
--------------------------------------------------
--- TEXTOS
--------------------------------------------------
 local TEXT = {
 	PT = {
-		LANGUAGE = "Português",
-		CLOSE_CONFIRM = "Tem certeza que deseja eliminar o menu?"
+		TITLE = "MENU",
+		CLOSE = "X",
+		MIN = "-",
+		CONFIRM = "Tem certeza que quer eliminar o menu?",
+		YES = "SIM",
+		NO = "NÃO"
 	},
+
 	EN = {
-		LANGUAGE = "English",
-		CLOSE_CONFIRM = "Are you sure you want to delete the menu?"
+		TITLE = "MENU",
+		CLOSE = "X",
+		MIN = "-",
+		CONFIRM = "Are you sure you want to delete the menu?",
+		YES = "YES",
+		NO = "NO"
 	}
 }
 
 -------------------------------------------------
--- SELECT LANGUAGE GUI
+-- LANGUAGE SELECT GUI
 -------------------------------------------------
-local langFrame = Instance.new("Frame")
-langFrame.Size = UDim2.new(0,500,0,300)
-langFrame.Position = UDim2.new(0.5,-250,0.5,-150)
-langFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
-langFrame.Parent = gui
+local langGui = Instance.new("ScreenGui")
+langGui.Parent = PlayerGui
+langGui.ResetOnSpawn = false
 
-Instance.new("UICorner", langFrame)
+-- BACKGROUND
+local bg = Instance.new("Frame")
+bg.Size = UDim2.new(1,0,1,0)
+bg.BackgroundColor3 = Color3.fromRGB(0,0,0)
+bg.Parent = langGui
 
-local strokeLang = Instance.new("UIStroke")
-strokeLang.Color = Color3.fromRGB(170,0,255)
-strokeLang.Thickness = 3
-strokeLang.Parent = langFrame
+-- TITLE USA/BR
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(0,300,0,60)
+title.Position = UDim2.new(0.5,-150,0,40)
+title.BackgroundTransparency = 1
+title.Text = "USA / BR"
+title.TextColor3 = Color3.fromRGB(255,255,255)
+title.TextScaled = true
+title.Font = Enum.Font.GothamBold
+title.Parent = bg
 
-local langText = Instance.new("TextLabel")
-langText.Size = UDim2.new(1,0,0,60)
-langText.BackgroundTransparency = 1
-langText.TextScaled = true
-langText.TextColor3 = Color3.new(1,1,1)
-langText.Text = "?"
-langText.Parent = langFrame
+-- USA BUTTON
+local usaBtn = Instance.new("ImageButton")
+usaBtn.Size = UDim2.new(0,200,0,120)
+usaBtn.Position = UDim2.new(0.25,-100,0.5,-60)
+usaBtn.Image = "rbxassetid://16047725674"
+usaBtn.Parent = bg
 
--------------------------------------------------
--- BOTÃO EUA
--------------------------------------------------
-local usaButton = Instance.new("TextButton")
-usaButton.Size = UDim2.new(0,200,0,120)
-usaButton.Position = UDim2.new(0.1,0,0.4,0)
-usaButton.Text = "🇺🇸\nWhat is your language"
-usaButton.TextScaled = true
-usaButton.BackgroundColor3 = Color3.fromRGB(30,30,30)
-usaButton.Parent = langFrame
-Instance.new("UICorner", usaButton)
+local usaTxt = Instance.new("TextLabel")
+usaTxt.Size = UDim2.new(1,0,0,30)
+usaTxt.Position = UDim2.new(0,0,1,5)
+usaTxt.BackgroundTransparency = 1
+usaTxt.Text = "ENGLISH"
+usaTxt.TextColor3 = Color3.fromRGB(255,255,255)
+usaTxt.TextScaled = true
+usaTxt.Parent = usaBtn
 
--------------------------------------------------
--- BOTÃO BRASIL
--------------------------------------------------
-local brButton = Instance.new("TextButton")
-brButton.Size = UDim2.new(0,200,0,120)
-brButton.Position = UDim2.new(0.55,0,0.4,0)
-brButton.Text = "🇧🇷\nQual a sua linguagem"
-brButton.TextScaled = true
-brButton.BackgroundColor3 = Color3.fromRGB(30,30,30)
-brButton.Parent = langFrame
-Instance.new("UICorner", brButton)
+-- BR BUTTON
+local brBtn = Instance.new("ImageButton")
+brBtn.Size = UDim2.new(0,200,0,120)
+brBtn.Position = UDim2.new(0.75,-100,0.5,-60)
+brBtn.Image = "rbxassetid://16047725919"
+brBtn.Parent = bg
 
--------------------------------------------------
--- MENU BOTÃO ⚠️
--------------------------------------------------
-local openButton = Instance.new("TextButton")
-openButton.Size = UDim2.new(0,60,0,60)
-openButton.Position = UDim2.new(0,10,0,20)
-openButton.BackgroundColor3 = Color3.fromRGB(0,0,0)
-openButton.Text = "⚠️"
-openButton.TextSize = 28
-openButton.Visible = false
-openButton.Parent = gui
-
-local strokeBtn = Instance.new("UIStroke")
-strokeBtn.Color = Color3.fromRGB(170,0,255)
-strokeBtn.Parent = openButton
-
-Instance.new("UICorner", openButton)
+local brTxt = Instance.new("TextLabel")
+brTxt.Size = UDim2.new(1,0,0,30)
+brTxt.Position = UDim2.new(0,0,1,5)
+brTxt.BackgroundTransparency = 1
+brTxt.Text = "PORTUGUÊS"
+brTxt.TextColor3 = Color3.fromRGB(255,255,255)
+brTxt.TextScaled = true
+brTxt.Parent = brBtn
 
 -------------------------------------------------
--- MENU PRINCIPAL
+-- MAIN GUI CREATOR
 -------------------------------------------------
-local menu = Instance.new("Frame")
-menu.Size = UDim2.new(0.8,0,0.8,0)
-menu.Position = UDim2.new(0.1,0,0.1,0)
-menu.BackgroundColor3 = Color3.fromRGB(0,0,0)
-menu.BackgroundTransparency = 0.35
-menu.Visible = false
-menu.Parent = gui
+local function createMainGUI()
 
-local strokeMenu = Instance.new("UIStroke")
-strokeMenu.Color = Color3.fromRGB(170,0,255)
-strokeMenu.Thickness = 4
-strokeMenu.Parent = menu
+	local gui = Instance.new("ScreenGui")
+	gui.Parent = PlayerGui
+	gui.ResetOnSpawn = false
 
-Instance.new("UICorner", menu)
+	-- OPEN BUTTON ⚠️
+	local openButton = Instance.new("TextButton")
+	openButton.Size = UDim2.new(0,60,0,60)
+	openButton.Position = UDim2.new(0,10,0,20)
+	openButton.BackgroundColor3 = Color3.fromRGB(0,0,0)
+	openButton.Text = "⚠️"
+	openButton.TextScaled = true
+	openButton.TextColor3 = Color3.fromRGB(255,255,255)
+	openButton.Parent = gui
 
--------------------------------------------------
--- BOTÃO -
--------------------------------------------------
-local minimize = Instance.new("TextButton")
-minimize.Size = UDim2.new(0,60,0,45)
-minimize.Position = UDim2.new(1,-140,0,20)
-minimize.Text = "-"
-minimize.TextScaled = true
-minimize.BackgroundColor3 = Color3.fromRGB(40,40,40)
-minimize.Parent = menu
-Instance.new("UICorner", minimize)
+	local stroke = Instance.new("UIStroke")
+	stroke.Color = Color3.fromRGB(170,0,255)
+	stroke.Thickness = 2
+	stroke.Parent = openButton
 
--------------------------------------------------
--- BOTÃO X
--------------------------------------------------
-local close = Instance.new("TextButton")
-close.Size = UDim2.new(0,60,0,45)
-close.Position = UDim2.new(1,-70,0,20)
-close.Text = "X"
-close.TextScaled = true
-close.BackgroundColor3 = Color3.fromRGB(120,0,0)
-close.Parent = menu
-Instance.new("UICorner", close)
+	-- MAIN MENU
+	local mainFrame = Instance.new("Frame")
+	mainFrame.Size = UDim2.new(0,800,0,500)
+	mainFrame.Position = UDim2.new(0.5,-400,0.5,-250)
+	mainFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
+	mainFrame.BackgroundTransparency = 0.3
+	mainFrame.Visible = false
+	mainFrame.Parent = gui
 
--------------------------------------------------
--- CONFIRM GUI
--------------------------------------------------
-local confirmGui = Instance.new("Frame")
-confirmGui.Size = UDim2.new(0,400,0,200)
-confirmGui.Position = UDim2.new(0.5,-200,0.5,-100)
-confirmGui.BackgroundColor3 = Color3.fromRGB(0,0,0)
-confirmGui.BackgroundTransparency = 0.2
-confirmGui.Visible = false
-confirmGui.Parent = gui
+	local stroke2 = Instance.new("UIStroke")
+	stroke2.Color = Color3.fromRGB(170,0,255)
+	stroke2.Thickness = 2
+	stroke2.Parent = mainFrame
 
-Instance.new("UICorner", confirmGui)
+	-- TITLE
+	local title = Instance.new("TextLabel")
+	title.Size = UDim2.new(1,0,0,50)
+	title.BackgroundTransparency = 1
+	title.Text = TEXT[LANG].TITLE
+	title.TextColor3 = Color3.fromRGB(255,255,255)
+	title.TextScaled = true
+	title.Parent = mainFrame
 
-local confirmText = Instance.new("TextLabel")
-confirmText.Size = UDim2.new(1,-20,0,80)
-confirmText.Position = UDim2.new(0,10,0,20)
-confirmText.BackgroundTransparency = 1
-confirmText.TextScaled = true
-confirmText.TextColor3 = Color3.new(1,1,1)
-confirmText.Parent = confirmGui
+	-- CLOSE X
+	local close = Instance.new("TextButton")
+	close.Size = UDim2.new(0,50,0,50)
+	close.Position = UDim2.new(1,-60,0,5)
+	close.Text = TEXT[LANG].CLOSE
+	close.Parent = mainFrame
 
--------------------------------------------------
--- YES / NO
--------------------------------------------------
-local yesButton = Instance.new("TextButton")
-yesButton.Size = UDim2.new(0,120,0,50)
-yesButton.Position = UDim2.new(0.2,0,1,-70)
-yesButton.Text = "✅"
-yesButton.TextScaled = true
-yesButton.BackgroundColor3 = Color3.fromRGB(0,120,0)
-yesButton.Parent = confirmGui
-Instance.new("UICorner", yesButton)
+	-- MINIMIZE
+	local min = Instance.new("TextButton")
+	min.Size = UDim2.new(0,50,0,50)
+	min.Position = UDim2.new(1,-120,0,5)
+	min.Text = TEXT[LANG].MIN
+	min.Parent = mainFrame
 
-local noButton = Instance.new("TextButton")
-noButton.Size = UDim2.new(0,120,0,50)
-noButton.Position = UDim2.new(0.6,0,1,-70)
-noButton.Text = "❌"
-noButton.TextScaled = true
-noButton.BackgroundColor3 = Color3.fromRGB(120,0,0)
-noButton.Parent = confirmGui
-Instance.new("UICorner", noButton)
+	-- CONFIRM GUI
+	local confirm = Instance.new("Frame")
+	confirm.Size = UDim2.new(0,400,0,200)
+	confirm.Position = UDim2.new(0.5,-200,0.5,-100)
+	confirm.BackgroundColor3 = Color3.fromRGB(0,0,0)
+	confirm.Visible = false
+	confirm.Parent = gui
 
--------------------------------------------------
--- FUNÇÃO APLICAR IDIOMA
--------------------------------------------------
-local function applyLanguage()
-	confirmText.Text = TEXT[LANG].CLOSE_CONFIRM
+	local txt = Instance.new("TextLabel")
+	txt.Size = UDim2.new(1,0,0.5,0)
+	txt.BackgroundTransparency = 1
+	txt.Text = TEXT[LANG].CONFIRM
+	txt.TextScaled = true
+	txt.TextColor3 = Color3.fromRGB(255,255,255)
+	txt.Parent = confirm
+
+	local yes = Instance.new("TextButton")
+	yes.Size = UDim2.new(0.4,0,0.3,0)
+	yes.Position = UDim2.new(0.1,0,0.6,0)
+	yes.Text = "✅ "..TEXT[LANG].YES
+	yes.Parent = confirm
+
+	local no = Instance.new("TextButton")
+	no.Size = UDim2.new(0.4,0,0.3,0)
+	no.Position = UDim2.new(0.5,0,0.6,0)
+	no.Text = "❌ "..TEXT[LANG].NO
+	no.Parent = confirm
+
+	-------------------------------------------------
+	-- BUTTON EVENTS
+	-------------------------------------------------
+
+	openButton.MouseButton1Click:Connect(function()
+		mainFrame.Visible = true
+	end)
+
+	min.MouseButton1Click:Connect(function()
+		mainFrame.Visible = false
+	end)
+
+	close.MouseButton1Click:Connect(function()
+		confirm.Visible = true
+		blur.Size = 20
+	end)
+
+	no.MouseButton1Click:Connect(function()
+		confirm.Visible = false
+		blur.Size = 0
+	end)
+
+	yes.MouseButton1Click:Connect(function()
+		gui:Destroy()
+		blur.Size = 0
+	end)
+
 end
 
 -------------------------------------------------
--- ESCOLHA IDIOMA
+-- LANGUAGE BUTTON EVENTS
 -------------------------------------------------
-usaButton.MouseButton1Click:Connect(function()
+
+usaBtn.MouseButton1Click:Connect(function()
 	LANG = "EN"
-	langFrame:Destroy()
-	openButton.Visible = true
-	applyLanguage()
+	langGui:Destroy()
+	createMainGUI()
 end)
 
-brButton.MouseButton1Click:Connect(function()
+brBtn.MouseButton1Click:Connect(function()
 	LANG = "PT"
-	langFrame:Destroy()
-	openButton.Visible = true
-	applyLanguage()
-end)
-
--------------------------------------------------
--- MENU FUNÇÕES
--------------------------------------------------
-openButton.MouseButton1Click:Connect(function()
-	menu.Visible = true
-end)
-
-minimize.MouseButton1Click:Connect(function()
-	menu.Visible = false
-end)
-
-close.MouseButton1Click:Connect(function()
-	confirmGui.Visible = true
-	blur.Size = 24
-end)
-
-yesButton.MouseButton1Click:Connect(function()
-	gui:Destroy()
-	blur:Destroy()
-end)
-
-noButton.MouseButton1Click:Connect(function()
-	confirmGui.Visible = false
-	blur.Size = 0
+	langGui:Destroy()
+	createMainGUI()
 end)
