@@ -1,5 +1,4 @@
--- AUTO STAND MENU COMPLETO (FORÇANDO TELEPORTE)
--- Coloque em LocalScript dentro de StarterGui
+-- AUTO STAND MENU COMPLETO (UNCLAIMED + YOUR TEXT HERE)
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
@@ -14,7 +13,7 @@ local menuAberto = false
 local autoStandAtivo = false
 
 -------------------------------------------------
--- GUI PRINCIPAL
+-- GUI
 -------------------------------------------------
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "AutoStandMenu"
@@ -22,7 +21,7 @@ screenGui.ResetOnSpawn = false
 screenGui.Parent = player:WaitForChild("PlayerGui")
 
 -------------------------------------------------
--- BOTÃO TOGGLE MENU
+-- BOTÃO MENU
 -------------------------------------------------
 local toggleButton = Instance.new("ImageButton")
 toggleButton.Size = UDim2.new(0,50,0,50)
@@ -41,7 +40,7 @@ toggleIcon.Font = Enum.Font.GothamBold
 toggleIcon.Parent = toggleButton
 
 -------------------------------------------------
--- MENU FRAME
+-- FRAME MENU
 -------------------------------------------------
 local menuFrame = Instance.new("Frame")
 menuFrame.Size = UDim2.new(0,260,0,170)
@@ -64,7 +63,7 @@ menuTitle.Font = Enum.Font.GothamBold
 menuTitle.Parent = menuFrame
 
 -------------------------------------------------
--- BOTÕES MENU
+-- BOTÕES
 -------------------------------------------------
 local minimizeButton = Instance.new("TextButton")
 minimizeButton.Size = UDim2.new(0,30,0,25)
@@ -72,7 +71,6 @@ minimizeButton.Position = UDim2.new(1,-70,0,5)
 minimizeButton.Text = "-"
 minimizeButton.BackgroundColor3 = Color3.fromRGB(70,70,70)
 minimizeButton.TextColor3 = Color3.new(1,1,1)
-minimizeButton.Font = Enum.Font.GothamBold
 minimizeButton.Parent = menuFrame
 Instance.new("UICorner", minimizeButton)
 
@@ -82,7 +80,6 @@ closeButton.Position = UDim2.new(1,-35,0,5)
 closeButton.Text = "X"
 closeButton.BackgroundColor3 = Color3.fromRGB(170,0,0)
 closeButton.TextColor3 = Color3.new(1,1,1)
-closeButton.Font = Enum.Font.GothamBold
 closeButton.Parent = menuFrame
 Instance.new("UICorner", closeButton)
 
@@ -111,7 +108,6 @@ autoText.Position = UDim2.new(0,10,0,0)
 autoText.BackgroundTransparency = 1
 autoText.Text = "AUTO STAND"
 autoText.TextColor3 = Color3.new(1,1,1)
-autoText.Font = Enum.Font.Gotham
 autoText.Parent = autoFrame
 
 local autoToggle = Instance.new("TextButton")
@@ -120,7 +116,6 @@ autoToggle.Position = UDim2.new(0.5,5,0.5,-15)
 autoToggle.Text = "OFF"
 autoToggle.BackgroundColor3 = Color3.fromRGB(60,60,60)
 autoToggle.TextColor3 = Color3.new(1,1,1)
-autoToggle.Font = Enum.Font.Gotham
 autoToggle.Parent = autoFrame
 Instance.new("UICorner", autoToggle)
 
@@ -135,14 +130,13 @@ Instance.new("UICorner", status).CornerRadius = UDim.new(1,0)
 -------------------------------------------------
 -- TELEPORTE FORÇADO
 -------------------------------------------------
-local function teleportForce(part)
+local function teleportForce(cf)
 
 	local char = player.Character or player.CharacterAdded:Wait()
-	local hrp = char:WaitForChild("HumanoidRootPart")
 
-	for i = 1, 25 do -- força várias vezes
-		if char and hrp then
-			char:PivotTo(part.CFrame + Vector3.new(0,3,0))
+	for i = 1, 30 do
+		if char then
+			char:PivotTo(cf + Vector3.new(0,3,0))
 		end
 		RunService.Heartbeat:Wait()
 	end
@@ -155,23 +149,28 @@ local function autoStand()
 
 	if not autoStandAtivo then return end
 
-	local stands = {}
+	local destinos = {}
 
 	for _, v in pairs(workspace:GetDescendants()) do
 		if v:IsA("TextLabel") or v:IsA("TextButton") then
-			if v.Text and string.find(string.upper(v.Text), "UNCLAIMED") then
-				
-				local part = v:FindFirstAncestorWhichIsA("BasePart")
-				if part then
-					table.insert(stands, part)
+			
+			if v.Text then
+				local txt = string.upper(v.Text)
+
+				if string.find(txt, "UNCLAIMED") or string.find(txt, "YOUR TEXT HERE") then
+					
+					local adornee = v.Parent
+					if adornee and adornee:IsA("BillboardGui") and adornee.Adornee then
+						table.insert(destinos, adornee.Adornee.CFrame)
+					end
 				end
 			end
 		end
 	end
 
-	if #stands > 0 then
-		local escolhido = stands[math.random(1, #stands)]
-		teleportForce(escolhido)
+	if #destinos > 0 then
+		local destino = destinos[math.random(1, #destinos)]
+		teleportForce(destino)
 	end
 end
 
