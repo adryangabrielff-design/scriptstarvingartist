@@ -429,15 +429,28 @@ local function createMainGUI()
 	no.Text = "❌ "..TEXT[LANG].NO
 	no.Parent = confirm
 
-	-------------------------------------------------
--- NAV BAR TOP
+-------------------------------------------------
+-- NAV BAR (BONITA CENTRALIZADA)
 -------------------------------------------------
 
-local navBar = Instance.new("Frame")
-navBar.Size = UDim2.new(1,0,0,50)
-navBar.Position = UDim2.new(0,0,0,50)
-navBar.BackgroundTransparency = 1
-navBar.Parent = mainFrame
+local navFrame = Instance.new("Frame")
+navFrame.Size = UDim2.new(1,0,0,50)
+navFrame.Position = UDim2.new(0,0,0,50)
+navFrame.BackgroundTransparency = 1
+navFrame.Parent = mainFrame
+
+-------------------------------------------------
+-- LAYOUT CENTRALIZAR
+-------------------------------------------------
+
+local navLayout = Instance.new("UIListLayout")
+navLayout.FillDirection = Enum.FillDirection.Horizontal
+navLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+navLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+navLayout.Padding = UDim.new(0,35)
+navLayout.Parent = navFrame
+
+local navButtons = {}
 
 -------------------------------------------------
 -- PAGE CONTAINER
@@ -471,6 +484,10 @@ settingsPage.BackgroundTransparency = 1
 settingsPage.Visible = false
 settingsPage.Parent = pageContainer
 
+-------------------------------------------------
+-- PAGE SWITCH
+-------------------------------------------------
+
 local function switchPage(page)
 	autoPage.Visible = false
 	playerPage.Visible = false
@@ -479,32 +496,66 @@ local function switchPage(page)
 	page.Visible = true
 end
 
-local function createNavButton(text, posX, page)
+-------------------------------------------------
+-- NAV BUTTON CREATOR
+-------------------------------------------------
 
-	local btn = Instance.new("TextButton")
-	btn.Size = UDim2.new(0,150,0,40)
-	btn.Position = UDim2.new(0,posX,0,5)
-	btn.BackgroundColor3 = Color3.fromRGB(0,0,0)
-	btn.TextColor3 = Color3.fromRGB(255,255,255)
-	btn.TextScaled = true
-	btn.Text = text
-	btn.Parent = navBar
+local function createNavButton(text, page)
 
-	local stroke = Instance.new("UIStroke")
-	stroke.Color = Color3.fromRGB(170,0,255)
-	stroke.Thickness = 2
-	stroke.Parent = btn
+	local holder = Instance.new("Frame")
+	holder.Size = UDim2.new(0,160,1,0)
+	holder.BackgroundTransparency = 1
+	holder.Parent = navFrame
 
-	btn.MouseButton1Click:Connect(function()
+	local button = Instance.new("TextButton")
+	button.Size = UDim2.new(1,0,0.7,0)
+	button.BackgroundTransparency = 1
+	button.Text = text
+	button.TextScaled = true
+	button.Font = Enum.Font.GothamBold
+	button.TextColor3 = Color3.fromRGB(170,170,170)
+	button.Parent = holder
+
+	local underline = Instance.new("Frame")
+	underline.Size = UDim2.new(1,0,0,3)
+	underline.Position = UDim2.new(0,0,1,-3)
+	underline.BackgroundColor3 = Color3.fromRGB(170,0,255)
+	underline.Visible = false
+	underline.Parent = holder
+
+	table.insert(navButtons, {btn = button, line = underline, page = page})
+
+	button.MouseButton1Click:Connect(function()
+
+		for _,v in pairs(navButtons) do
+			v.btn.TextColor3 = Color3.fromRGB(170,170,170)
+			v.line.Visible = false
+		end
+
+		button.TextColor3 = Color3.fromRGB(255,255,255)
+		underline.Visible = true
+
 		switchPage(page)
+
 	end)
 
+	return button
 end
 
-createNavButton("AUTO", 20, autoPage)
-createNavButton("PLAYER", 190, playerPage)
-createNavButton("SETTINGS", 360, settingsPage)
+-------------------------------------------------
+-- CREATE NAV BUTTONS
+-------------------------------------------------
 
+local autoBtn = createNavButton("AUTO", autoPage)
+local playerBtn = createNavButton("PLAYER", playerPage)
+local settingsBtn = createNavButton("SETTINGS", settingsPage)
+
+-------------------------------------------------
+-- DEFAULT SELECT AUTO
+-------------------------------------------------
+
+autoBtn.TextColor3 = Color3.fromRGB(255,255,255)
+navButtons[1].line.Visible = true
 
 	-------------------------------------------------
 	-- EVENTS
@@ -532,9 +583,7 @@ createNavButton("SETTINGS", 360, settingsPage)
 		gui:Destroy()
 		blur.Size = 0
 	end)
-
-end
-
+	
 -------------------------------------------------
 -- LANGUAGE BUTTON EVENTS
 -------------------------------------------------
