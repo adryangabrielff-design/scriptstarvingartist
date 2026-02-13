@@ -341,7 +341,7 @@ local function createMainGUI()
 	-------------------------------------------------
 
 	local mainFrame = Instance.new("Frame")
-	mainFrame.Size = UDim2.new(0,800,0,500)
+	mainFrame.Size = UDim2.new(0,700,0,500)
 	mainFrame.Position = UDim2.new(0.5,-400,0.5,-250)
 	mainFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
 	mainFrame.BackgroundTransparency = 0.3
