@@ -1,4 +1,4 @@
--- AUTO STAND MENU COMPLETO (UNCLAIMED + YOUR TEXT HERE)
+-- AUTO STAND MENU COMPLETO (VERSÃO ESTÁVEL)
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
@@ -133,42 +133,22 @@ Instance.new("UICorner", status).CornerRadius = UDim.new(1,0)
 -------------------------------------------------
 local function teleportForce(cf)
 	local char = player.Character or player.CharacterAdded:Wait()
-	for i = 1, 25 do
-		if char then
-			char:PivotTo(cf + Vector3.new(0,3,0))
-		end
+	for i = 1, 20 do
+		char:PivotTo(cf + Vector3.new(0,3,0))
 		RunService.Heartbeat:Wait()
 	end
 end
 
 -------------------------------------------------
--- AUTO CLAIM SUPER FORÇADO
+-- AUTO CLAIM SIMPLES
 -------------------------------------------------
-local function pressE()
+local function autoClaim()
+	-- Tecla E
 	VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
 	task.wait(0.1)
 	VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
-end
 
-local function clickClaimGUI()
-	local pg = player:FindFirstChild("PlayerGui")
-	if not pg then return end
-
-	for _, v in pairs(pg:GetDescendants()) do
-		if v:IsA("TextButton") then
-			local txt = string.upper(v.Text or "")
-			if string.find(txt, "REIVIND") then
-				pcall(function()
-					v:Activate()
-					v.MouseButton1Click:Fire()
-				end)
-				return true
-			end
-		end
-	end
-end
-
-local function clickDetectorClaim()
+	-- ClickDetector
 	for _, v in pairs(workspace:GetDescendants()) do
 		if v:IsA("ClickDetector") then
 			pcall(function()
@@ -178,19 +158,11 @@ local function clickDetectorClaim()
 	end
 end
 
-local function forceClaim()
-	for i = 1, 6 do
-		clickClaimGUI()
-		clickDetectorClaim()
-		pressE()
-		task.wait(0.3)
-	end
-end
-
 -------------------------------------------------
--- AUTO STAND CORRIGIDO
+-- AUTO STAND LOOP
 -------------------------------------------------
 local function autoStandLoop()
+
 	while autoStandAtivo do
 
 		local destinos = {}
@@ -201,23 +173,26 @@ local function autoStandLoop()
 					local txt = string.upper(v.Text)
 
 					if string.find(txt, "UNCLAIMED") or string.find(txt, "YOUR TEXT HERE") then
+
 						local billboard = v:FindFirstAncestorWhichIsA("BillboardGui")
 						if billboard and billboard.Adornee then
-							table.insert(destinos, billboard.Adornee)
+							table.insert(destinos, billboard.Adornee.CFrame)
 						end
+
 					end
 				end
 			end
 		end
 
 		if #destinos > 0 then
-			local standPart = destinos[math.random(1,#destinos)]
-			teleportForce(standPart.CFrame)
-			task.wait(0.8)
-			forceClaim()
+			local destino = destinos[math.random(1,#destinos)]
+			teleportForce(destino)
+			task.wait(1)
+			autoClaim()
 		end
 
 		task.wait(2)
+
 	end
 end
 
