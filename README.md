@@ -266,6 +266,104 @@ local function createMainGUI()
 	mainStroke.Color=Color3.fromRGB(170,0,255)
 	mainStroke.Thickness=4
 
+	-------------------------------------------------
+-- CLOSE (X) BUTTON
+-------------------------------------------------
+
+local closeHolder = Instance.new("Frame", main)
+closeHolder.Size = UDim2.new(0,40,0,30)
+closeHolder.Position = UDim2.new(1,-45,0,10)
+closeHolder.BackgroundColor3 = Color3.fromRGB(40,0,60)
+
+local closeCorner = Instance.new("UICorner", closeHolder)
+closeCorner.CornerRadius = UDim.new(0,6)
+
+local closeStroke = Instance.new("UIStroke", closeHolder)
+closeStroke.Color = Color3.fromRGB(170,0,255)
+closeStroke.Thickness = 2
+
+local closeBtn = Instance.new("TextButton", closeHolder)
+closeBtn.Size = UDim2.new(1,0,1,0)
+closeBtn.BackgroundTransparency = 1
+closeBtn.Text = "X"
+closeBtn.TextScaled = true
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.TextColor3 = Color3.fromRGB(170,0,255)
+
+-------------------------------------------------
+-- MINIMIZE (-) BUTTON
+-------------------------------------------------
+
+local miniHolder = closeHolder:Clone()
+miniHolder.Parent = main
+miniHolder.Position = UDim2.new(1,-90,0,10)
+
+local miniBtn = miniHolder:FindFirstChildOfClass("TextButton")
+miniBtn.Text = "-"
+
+-------------------------------------------------
+-- MINIMIZE FUNCTION
+-------------------------------------------------
+
+miniBtn.MouseButton1Click:Connect(function()
+	main.Visible = false
+end)
+
+-------------------------------------------------
+-- CLOSE WITH CONFIRM
+-------------------------------------------------
+
+closeBtn.MouseButton1Click:Connect(function()
+
+	local confirm = Instance.new("Frame", gui)
+	confirm.Size = UDim2.new(0,260,0,140)
+	confirm.Position = UDim2.new(0.5,-130,0.5,-70)
+	confirm.BackgroundColor3 = Color3.fromRGB(20,0,30)
+
+	local cCorner = Instance.new("UICorner", confirm)
+	local cStroke = Instance.new("UIStroke", confirm)
+	cStroke.Color = Color3.fromRGB(170,0,255)
+	cStroke.Thickness = 3
+
+	local txt = Instance.new("TextLabel", confirm)
+	txt.Size = UDim2.new(1,0,0.5,0)
+	txt.BackgroundTransparency = 1
+	txt.Text = "Deseja fechar o menu?"
+	txt.TextScaled = true
+	txt.Font = Enum.Font.GothamBold
+	txt.TextColor3 = Color3.new(1,1,1)
+
+	local yes = Instance.new("TextButton", confirm)
+	yes.Size = UDim2.new(0.45,0,0.3,0)
+	yes.Position = UDim2.new(0.05,0,0.65,0)
+	yes.Text = "SIM"
+	yes.TextScaled = true
+	yes.BackgroundColor3 = Color3.fromRGB(40,0,60)
+	yes.TextColor3 = Color3.fromRGB(170,0,255)
+
+	local no = yes:Clone()
+	no.Parent = confirm
+	no.Position = UDim2.new(0.5,0,0.65,0)
+	no.Text = "NÃO"
+
+	local yCorner = Instance.new("UICorner", yes)
+	local yStroke = Instance.new("UIStroke", yes)
+	yStroke.Color = Color3.fromRGB(170,0,255)
+
+	local nCorner = Instance.new("UICorner", no)
+	local nStroke = Instance.new("UIStroke", no)
+	nStroke.Color = Color3.fromRGB(170,0,255)
+
+	yes.MouseButton1Click:Connect(function()
+		gui:Destroy()
+	end)
+
+	no.MouseButton1Click:Connect(function()
+		confirm:Destroy()
+	end)
+
+end)
+
 	open.MouseButton1Click:Connect(function()
 		main.Visible = not main.Visible
 	end)
