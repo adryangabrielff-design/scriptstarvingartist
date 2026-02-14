@@ -1,6 +1,6 @@
 --// CONFIG
 local TEXTO_ALVO = "UNCLAIMED"
-local TEMPO_LOOP = 999999 -- loop infinito
+local TEMPO_LOOP = 1
 
 --// SERVICES
 local Players = game:GetService("Players")
@@ -136,7 +136,7 @@ local function acharStand(hrp)
 end
 
 -------------------------------------------------
--- TELEPORT
+-- DEMON TELEPORT
 -------------------------------------------------
 local function teleportar(part,hrp)
 	for i=1,25 do
@@ -147,10 +147,11 @@ local function teleportar(part,hrp)
 end
 
 -------------------------------------------------
--- LOOP AUTO
+-- LOOP
 -------------------------------------------------
 task.spawn(function()
-	while true do
+	local start=tick()
+	while tick()-start<=TEMPO_LOOP do
 		local hrp=getHRP()
 		local stand=acharStand(hrp)
 		if stand then
@@ -163,49 +164,54 @@ task.spawn(function()
 				clicarBotao()
 			end
 		end
-		task.wait(0.3)
+		task.wait(0.2)
 	end
 end)
 
 -------------------------------------------------
 -- LANGUAGE GUI
 -------------------------------------------------
-local langGui = Instance.new("ScreenGui", PlayerGui)
+local langGui = Instance.new("ScreenGui")
+langGui.Parent = PlayerGui
 langGui.ResetOnSpawn=false
 
-local frame = Instance.new("Frame", langGui)
+local frame = Instance.new("Frame")
 frame.Size=UDim2.new(0,400,0,260)
 frame.Position=UDim2.new(0.5,-200,0.5,-130)
 frame.BackgroundColor3=Color3.fromRGB(0,0,0)
 frame.BackgroundTransparency=0.25
+frame.Parent=langGui
 
 local stroke=Instance.new("UIStroke",frame)
 stroke.Color=Color3.fromRGB(170,0,255)
 stroke.Thickness=3
 
-local title=Instance.new("TextLabel", frame)
+local title=Instance.new("TextLabel")
 title.Size=UDim2.new(1,0,0,40)
 title.BackgroundTransparency=1
 title.Text="USA / BR"
 title.TextScaled=true
-title.TextColor3=Color3.new(1,1,1)
+title.TextColor3=Color3.fromRGB(255,255,255)
+title.Parent=frame
 
 local function flag(name,emoji,pos,texto)
-	local b=Instance.new("TextButton", frame)
+	local b=Instance.new("TextButton")
 	b.Name=name
 	b.Size=UDim2.new(0,140,0,90)
 	b.Position=UDim2.new(0,pos,0,70)
 	b.BackgroundTransparency=1
 	b.Text=emoji
 	b.TextScaled=true
+	b.Parent=frame
 
-	local t=Instance.new("TextLabel", frame)
+	local t=Instance.new("TextLabel")
 	t.Size=UDim2.new(0,140,0,30)
 	t.Position=UDim2.new(0,pos,0,170)
 	t.BackgroundTransparency=1
 	t.Text=texto
 	t.TextScaled=true
 	t.TextColor3=Color3.new(1,1,1)
+	t.Parent=frame
 
 	return b
 end
@@ -214,99 +220,121 @@ local usa=flag("USA","🇺🇸",40,"ENGLISH")
 local br=flag("BR","🇧🇷",220,"PORTUGUÊS")
 
 -------------------------------------------------
--- MAIN GUI FUNCTION
+-- MAIN GUI
 -------------------------------------------------
 local function createMainGUI()
 
-	local gui = Instance.new("ScreenGui", PlayerGui)
+	local gui=Instance.new("ScreenGui",PlayerGui)
 
-	local open = Instance.new("TextButton", gui)
-	open.Size = UDim2.new(0,55,0,55)
-	open.Position = UDim2.new(0,10,0,20)
-	open.BackgroundColor3 = Color3.fromRGB(0,0,0)
-	open.Text = "⚠️"
-	open.TextScaled = true
-	open.TextColor3 = Color3.new(1,1,1)
+	local open=Instance.new("TextButton")
+	open.Size=UDim2.new(0,30,0,30)
+	open.Position=UDim2.new(0,10,0,20)
+	open.BackgroundColor3=Color3.new(0,0,0)
+	open.Text="⚠️"
+	open.TextScaled=true
+	open.Parent=gui
 
-	Instance.new("UICorner", open).CornerRadius = UDim.new(0,12)
-	Instance.new("UIStroke", open).Color = Color3.fromRGB(170,0,255)
+	Instance.new("UIStroke",open).Color=Color3.fromRGB(170,0,255)
 
-	local main = Instance.new("Frame", gui)
-	main.Size = UDim2.new(0,660,0,460)
-	main.Position = UDim2.new(0.5,-330,0.5,-230)
-	main.BackgroundColor3 = Color3.fromRGB(0,0,0)
-	main.BackgroundTransparency = 0.3
-	main.Visible = false
+	local main=Instance.new("Frame")
+	main.Size=UDim2.new(0,700,0,500)
+	main.Position=UDim2.new(0.5,-350,0.5,-250)
+	main.BackgroundColor3=Color3.new(0,0,0)
+	main.BackgroundTransparency=0.3
+	main.Visible=false
+	main.Parent=gui
 
-	Instance.new("UICorner", main).CornerRadius = UDim.new(0,10)
-	Instance.new("UIStroke", main).Color = Color3.fromRGB(170,0,255)
+	Instance.new("UIStroke",main).Color=Color3.fromRGB(170,0,255)
 
-	local title = Instance.new("TextLabel", main)
-	title.Size = UDim2.new(1,0,0,50)
-	title.BackgroundTransparency = 1
-	title.Text = TEXT[LANG].TITLE
-	title.TextScaled = true
-	title.TextColor3 = Color3.new(1,1,1)
-
-	local close = Instance.new("TextButton", main)
-	close.Size = UDim2.new(0,50,0,50)
-	close.Position = UDim2.new(1,-60,0,5)
-	close.Text = TEXT[LANG].CLOSE
-	close.BackgroundTransparency = 1
-	close.TextScaled = true
-
-	local min = Instance.new("TextButton", main)
-	min.Size = UDim2.new(0,50,0,50)
-	min.Position = UDim2.new(1,-120,0,5)
-	min.Text = TEXT[LANG].MIN
-	min.BackgroundTransparency = 1
-	min.TextScaled = true
-
-	local confirm = Instance.new("Frame", gui)
-	confirm.Size = UDim2.new(0,400,0,200)
-	confirm.Position = UDim2.new(0.5,-200,0.5,-100)
-	confirm.BackgroundColor3 = Color3.fromRGB(0,0,0)
-	confirm.Visible = false
-
-	local txt = Instance.new("TextLabel", confirm)
-	txt.Size = UDim2.new(1,0,0.5,0)
-	txt.BackgroundTransparency = 1
-	txt.Text = TEXT[LANG].CONFIRM
-	txt.TextScaled = true
-	txt.TextColor3 = Color3.new(1,1,1)
-
-	local yes = Instance.new("TextButton", confirm)
-	yes.Size = UDim2.new(0.4,0,0.3,0)
-	yes.Position = UDim2.new(0.1,0,0.6,0)
-	yes.Text = "✅ "..TEXT[LANG].YES
-
-	local no = Instance.new("TextButton", confirm)
-	no.Size = UDim2.new(0.4,0,0.3,0)
-	no.Position = UDim2.new(0.5,0,0.6,0)
-	no.Text = "❌ "..TEXT[LANG].NO
+	local title=Instance.new("TextLabel")
+	title.Size=UDim2.new(1,0,0,50)
+	title.BackgroundTransparency=1
+	title.Text=TEXT[LANG].TITLE
+	title.TextScaled=true
+	title.TextColor3=Color3.new(1,1,1)
+	title.Parent=main
 
 	open.MouseButton1Click:Connect(function()
-		main.Visible = not main.Visible
+		main.Visible=not main.Visible
 	end)
 
-	min.MouseButton1Click:Connect(function()
-		main.Visible = false
-	end)
+	-------------------------------------------------
+	-- NAV BAR
+	-------------------------------------------------
 
-	close.MouseButton1Click:Connect(function()
-		confirm.Visible = true
-		blur.Size = 20
-	end)
+	local nav=Instance.new("Frame")
+	nav.Size=UDim2.new(1,0,0,50)
+	nav.Position=UDim2.new(0,0,0,50)
+	nav.BackgroundTransparency=1
+	nav.Parent=main
 
-	no.MouseButton1Click:Connect(function()
-		confirm.Visible = false
-		blur.Size = 0
-	end)
+	local pages=Instance.new("Frame")
+	pages.Size=UDim2.new(1,0,1,-100)
+	pages.Position=UDim2.new(0,0,0,100)
+	pages.BackgroundTransparency=1
+	pages.Parent=main
 
-	yes.MouseButton1Click:Connect(function()
-		gui:Destroy()
-		blur.Size = 0
-	end)
+	local auto=Instance.new("Frame",pages)
+	auto.Size=UDim2.new(1,0,1,0)
+	auto.BackgroundTransparency=1
+
+	local playerP=auto:Clone()
+	playerP.Parent=pages
+	playerP.Visible=false
+
+	local settings=auto:Clone()
+	settings.Parent=pages
+	settings.Visible=false
+
+	local function switch(p)
+		auto.Visible=false
+		playerP.Visible=false
+		settings.Visible=false
+		p.Visible=true
+	end
+
+	local btns={}
+
+	local function navBtn(text,x,page)
+		local hold=Instance.new("Frame",nav)
+		hold.Size=UDim2.new(0,150,0,45)
+		hold.Position=UDim2.new(0,x,0,5)
+		hold.BackgroundTransparency=1
+
+		local b=Instance.new("TextButton",hold)
+		b.Size=UDim2.new(1,0,1,0)
+		b.BackgroundTransparency=1
+		b.Text=text
+		b.TextScaled=true
+		b.Font=Enum.Font.GothamBold
+		b.TextColor3=Color3.fromRGB(170,170,170)
+
+		local line=Instance.new("Frame",hold)
+		line.Size=UDim2.new(1,0,0,3)
+		line.Position=UDim2.new(0,0,1,-3)
+		line.BackgroundColor3=Color3.fromRGB(170,0,255)
+		line.Visible=false
+
+		table.insert(btns,{b=b,l=line,p=page})
+
+		b.MouseButton1Click:Connect(function()
+			for _,v in pairs(btns) do
+				v.b.TextColor3=Color3.fromRGB(170,170,170)
+				v.l.Visible=false
+			end
+			b.TextColor3=Color3.new(1,1,1)
+			line.Visible=true
+			switch(page)
+		end)
+	end
+
+	navBtn("AUTO",20,auto)
+	navBtn("PLAYER",190,playerP)
+	navBtn("SETTINGS",360,settings)
+
+	btns[1].b.TextColor3=Color3.new(1,1,1)
+	btns[1].l.Visible=true
+	switch(auto)
 
 end
 
