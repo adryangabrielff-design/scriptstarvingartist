@@ -285,7 +285,7 @@ local function createMainGUI()
 	mainStroke.Color=Color3.fromRGB(170,0,255)
 	mainStroke.Thickness=4
 
-	-------------------------------------------------
+-------------------------------------------------
 -- CLOSE (X) BUTTON
 -------------------------------------------------
 
@@ -405,9 +405,23 @@ end)
 	pages.Parent=main
 
 	local auto=Instance.new("Frame",pages)
+
+    auto.Size = UDim2.new(1,0,1,0)
+    auto.BackgroundTransparency = 1
+
+    local playerP = Instance.new("Frame", pages)
+    playerP.Size = UDim2.new(1,0,1,0)
+    playerP.BackgroundTransparency = 1
+    playerP.Visible = false
+
+    local settings = Instance.new("Frame", pages)
+    settings.Size = UDim2.new(1,0,1,0)
+    settings.BackgroundTransparency = 1
+    settings.Visible = false
+
 	
 -------------------------------------------------
--- AUTO SELL ART TOGGLE
+-- AUTO SELL ART TOGGLE (SWITCH STYLE)
 -------------------------------------------------
 
 local autoSellEnabled = false
@@ -424,50 +438,79 @@ local holderStroke = Instance.new("UIStroke", autoSellHolder)
 holderStroke.Color = Color3.fromRGB(170,0,255)
 holderStroke.Thickness = 2
 
+-- TEXTO
 local autoSellText = Instance.new("TextLabel", autoSellHolder)
-autoSellText.Size = UDim2.new(0.65,0,1,0)
+autoSellText.Size = UDim2.new(0.6,0,1,0)
 autoSellText.BackgroundTransparency = 1
 autoSellText.Text = TEXT[LANG].AUTO_SELL_ART
 autoSellText.TextScaled = true
 autoSellText.Font = Enum.Font.GothamBold
 autoSellText.TextColor3 = Color3.new(1,1,1)
 
-local toggleBtn = Instance.new("TextButton", autoSellHolder)
-toggleBtn.Size = UDim2.new(0.35,0,0.7,0)
-toggleBtn.Position = UDim2.new(0.63,0,0.15,0)
-toggleBtn.BackgroundColor3 = Color3.fromRGB(40,0,60)
-toggleBtn.Text = TEXT[LANG].OFF
-toggleBtn.TextScaled = true
-toggleBtn.Font = Enum.Font.GothamBold
-toggleBtn.TextColor3 = Color3.fromRGB(170,0,255)
-
-local toggleCorner = Instance.new("UICorner", toggleBtn)
-toggleCorner.CornerRadius = UDim.new(0,8)
-
-local toggleStroke = Instance.new("UIStroke", toggleBtn)
-toggleStroke.Color = Color3.fromRGB(170,0,255)
-
 -------------------------------------------------
--- TOGGLE FUNCTION
+-- SWITCH BASE
 -------------------------------------------------
 
-toggleBtn.MouseButton1Click:Connect(function()
+local switchFrame = Instance.new("Frame", autoSellHolder)
+switch.Size = UDim2.new(0,70,0,30)
+switch.Position = UDim2.new(1,-80,0.5,-15)
+switchFrame.BackgroundColor3 = Color3.fromRGB(90,90,90) -- cinza desligado
+
+local switchCorner = Instance.new("UICorner", switch)
+switchCorner.CornerRadius = UDim.new(1,0)
+
+-------------------------------------------------
+-- SWITCH BOLINHA
+-------------------------------------------------
+
+local knob = Instance.new("Frame", switchFrame)
+knob.Size = UDim2.new(0,26,0,26)
+knob.Position = UDim2.new(0,2,0.5,-13)
+knob.BackgroundColor3 = Color3.new(1,1,1)
+
+local knobCorner = Instance.new("UICorner", knob)
+knobCorner.CornerRadius = UDim.new(1,0)
+
+-------------------------------------------------
+-- FUNÇÃO VISUAL
+-------------------------------------------------
+
+local function updateSwitch()
 
 	if autoSellEnabled then
-    local stand=acharStand(hrp)
-    if stand then
-        local part=getPart(stand)
-        if part then
-            teleportar(part,hrp)
-            ativarClickDetector(stand)
-            spamE(20)
-            spamMouse(20)
-            clicarBotao()
-        end
-    end
+		switchFrame.BackgroundColor3 = Color3.fromRGB(0,170,0) -- verde
+		knob:TweenPosition(
+			UDim2.new(1,-28,0.5,-13),
+			Enum.EasingDirection.Out,
+			Enum.EasingStyle.Quad,
+			0.15,
+			true
+		)
+	else
+		switchFrame.BackgroundColor3 = Color3.fromRGB(90,90,90) -- cinza
+		knob:TweenPosition(
+			UDim2.new(0,2,0.5,-13),
+			Enum.EasingDirection.Out,
+			Enum.EasingStyle.Quad,
+			0.15,
+			true
+		)
+	end
+
 end
 
+-------------------------------------------------
+-- CLICK SWITCH
+-------------------------------------------------
+
+switchFrame.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		autoSellEnabled = not autoSellEnabled
+		updateSwitch()
+	end
 end)
+
+updateSwitch()
 
 	auto.Size=UDim2.new(1,0,1,0)
 	auto.BackgroundTransparency=1
