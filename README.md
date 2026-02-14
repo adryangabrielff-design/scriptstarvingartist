@@ -224,40 +224,37 @@ local br=flag("BR","🇧🇷",220,"PORTUGUÊS")
 -------------------------------------------------
 local function createMainGUI()
 
-	local gui = Instance.new("ScreenGui",PlayerGui)
+	local gui = Instance.new("ScreenGui", PlayerGui)
 
 	-------------------------------------------------
-	-- OPEN BUTTON (BONITO)
+	-- OPEN BUTTON
 	-------------------------------------------------
 
 	local open = Instance.new("TextButton")
-	open.Size = UDim2.new(0,55,0,55) -- levemente menor
+	open.Size = UDim2.new(0,55,0,55)
 	open.Position = UDim2.new(0,10,0,20)
 	open.BackgroundColor3 = Color3.fromRGB(0,0,0)
 	open.Text = "⚠️"
 	open.TextScaled = true
-	open.TextSize = 28 -- controla tamanho visual do emoji
+	open.TextSize = 25
 	open.TextColor3 = Color3.new(1,1,1)
 	open.Parent = gui
 
-	-- Bordas roxas iguais menu
 	local strokeOpen = Instance.new("UIStroke")
 	strokeOpen.Color = Color3.fromRGB(170,0,255)
-	strokeOpen.Thickness = 3 -- mais grosso
+	strokeOpen.Thickness = 3
 	strokeOpen.Parent = open
 
-	-- Cantos arredondados
 	local cornerOpen = Instance.new("UICorner")
-	cornerOpen.CornerRadius = UDim.new(0,12) -- arredondado mas não círculo
+	cornerOpen.CornerRadius = UDim.new(0,12)
 	cornerOpen.Parent = open
 
-
 	-------------------------------------------------
-	-- MAIN MENU (MENOR + BORDA MAIS GROSSA)
+	-- MAIN MENU
 	-------------------------------------------------
 
 	local main = Instance.new("Frame")
-	main.Size = UDim2.new(0,660,0,460) -- levemente menor
+	main.Size = UDim2.new(0,660,0,460)
 	main.Position = UDim2.new(0.5,-330,0.5,-230)
 	main.BackgroundColor3 = Color3.fromRGB(0,0,0)
 	main.BackgroundTransparency = 0.3
@@ -266,14 +263,12 @@ local function createMainGUI()
 
 	local strokeMain = Instance.new("UIStroke")
 	strokeMain.Color = Color3.fromRGB(170,0,255)
-	strokeMain.Thickness = 4 -- borda mais grossa que antes
+	strokeMain.Thickness = 4
 	strokeMain.Parent = main
 
-	-- Cantos levemente arredondados menu
 	local cornerMain = Instance.new("UICorner")
 	cornerMain.CornerRadius = UDim.new(0,10)
 	cornerMain.Parent = main
-
 
 	-------------------------------------------------
 	-- TITLE
@@ -287,14 +282,96 @@ local function createMainGUI()
 	title.TextColor3 = Color3.new(1,1,1)
 	title.Parent = main
 
+	-------------------------------------------------
+	-- CLOSE / MIN
+	-------------------------------------------------
+
+	local close = Instance.new("TextButton")
+	close.Size = UDim2.new(0,50,0,50)
+	close.Position = UDim2.new(1,-60,0,5)
+	close.BackgroundTransparency = 1
+	close.TextColor3 = Color3.new(1,1,1)
+	close.TextScaled = true
+	close.Text = TEXT[LANG].CLOSE
+	close.Parent = main
+
+	local min = Instance.new("TextButton")
+	min.Size = UDim2.new(0,50,0,50)
+	min.Position = UDim2.new(1,-120,0,5)
+	min.BackgroundTransparency = 1
+	min.TextColor3 = Color3.new(1,1,1)
+	min.TextScaled = true
+	min.Text = TEXT[LANG].MIN
+	min.Parent = main
 
 	-------------------------------------------------
-	-- OPEN EVENT
+	-- CONFIRM GUI
+	-------------------------------------------------
+
+	local confirm = Instance.new("Frame")
+	confirm.Size = UDim2.new(0,400,0,200)
+	confirm.Position = UDim2.new(0.5,-200,0.5,-100)
+	confirm.BackgroundColor3 = Color3.fromRGB(0,0,0)
+	confirm.Visible = false
+	confirm.Parent = gui
+
+	local confirmStroke = Instance.new("UIStroke")
+	confirmStroke.Color = Color3.fromRGB(170,0,255)
+	confirmStroke.Thickness = 3
+	confirmStroke.Parent = confirm
+
+	local confirmCorner = Instance.new("UICorner")
+	confirmCorner.CornerRadius = UDim.new(0,10)
+	confirmCorner.Parent = confirm
+
+	local txt = Instance.new("TextLabel")
+	txt.Size = UDim2.new(1,0,0.5,0)
+	txt.BackgroundTransparency = 1
+	txt.Text = TEXT[LANG].CONFIRM
+	txt.TextScaled = true
+	txt.TextColor3 = Color3.fromRGB(255,255,255)
+	txt.Parent = confirm
+
+	local yes = Instance.new("TextButton")
+	yes.Size = UDim2.new(0.4,0,0.3,0)
+	yes.Position = UDim2.new(0.1,0,0.6,0)
+	yes.Text = "✅ "..TEXT[LANG].YES
+	yes.Parent = confirm
+
+	local no = Instance.new("TextButton")
+	no.Size = UDim2.new(0.4,0,0.3,0)
+	no.Position = UDim2.new(0.5,0,0.6,0)
+	no.Text = "❌ "..TEXT[LANG].NO
+	no.Parent = confirm
+
+	-------------------------------------------------
+	-- EVENTS
 	-------------------------------------------------
 
 	open.MouseButton1Click:Connect(function()
 		main.Visible = not main.Visible
 	end)
+
+	min.MouseButton1Click:Connect(function()
+		main.Visible = false
+	end)
+
+	close.MouseButton1Click:Connect(function()
+		confirm.Visible = true
+		blur.Size = 20
+	end)
+
+	no.MouseButton1Click:Connect(function()
+		confirm.Visible = false
+		blur.Size = 0
+	end)
+
+	yes.MouseButton1Click:Connect(function()
+		gui:Destroy()
+		blur.Size = 0
+	end)
+
+end
 
 	-------------------------------------------------
 	-- NAV BAR
