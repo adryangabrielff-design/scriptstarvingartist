@@ -55,7 +55,7 @@ local TEXT = {
 		SETTINGS = "SETTINGS",
 		AUTO_SELL_ART = "AUTO SELL ART",
         ON = "ON",
-        OFF = "OFF"
+        OFF = "OFF",
 
 		CONFIRM_CLOSE = "Do you want to close the menu?"
 	}
