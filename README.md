@@ -23,13 +23,20 @@ blur.Parent = Lighting
 local LANG = "PT"
 
 local TEXT = {
+
 	PT = {
 		TITLE = "MENU",
 		CLOSE = "X",
 		MIN = "-",
 		CONFIRM = "Tem certeza que quer eliminar o menu?",
 		YES = "SIM",
-		NO = "NÃO"
+		NO = "NÃO",
+
+		AUTO = "AUTO",
+		PLAYER = "PLAYER",
+		SETTINGS = "CONFIGURAÇÕES",
+
+		CONFIRM_CLOSE = "Deseja fechar o menu?"
 	},
 
 	EN = {
@@ -38,7 +45,13 @@ local TEXT = {
 		MIN = "-",
 		CONFIRM = "Are you sure you want to delete the menu?",
 		YES = "YES",
-		NO = "NO"
+		NO = "NO",
+
+		AUTO = "AUTO",
+		PLAYER = "PLAYER",
+		SETTINGS = "SETTINGS",
+
+		CONFIRM_CLOSE = "Do you want to close the menu?"
 	}
 }
 
@@ -169,47 +182,55 @@ task.spawn(function()
 end)
 
 -------------------------------------------------
--- LANGUAGE SYSTEM
+-- LANGUAGE GUI
 -------------------------------------------------
+local langGui = Instance.new("ScreenGui")
+langGui.Parent = PlayerGui
+langGui.ResetOnSpawn=false
 
-local LANG = "EN" -- padrão
+local frame = Instance.new("Frame")
+frame.Size=UDim2.new(0,400,0,260)
+frame.Position=UDim2.new(0.5,-200,0.5,-130)
+frame.BackgroundColor3=Color3.fromRGB(0,0,0)
+frame.BackgroundTransparency=0.25
+frame.Parent=langGui
 
-local TEXT = {
+local stroke=Instance.new("UIStroke",frame)
+stroke.Color=Color3.fromRGB(170,0,255)
+stroke.Thickness=3
 
-	EN = {
-		TITLE = "USA / BR",
-		CLOSE = "X",
-		MIN = "-",
-		CONFIRM = "Are you sure you want to close the menu?",
-		YES = "YES",
-		NO = "NO",
+local title=Instance.new("TextLabel")
+title.Size=UDim2.new(1,0,0,40)
+title.BackgroundTransparency=1
+title.Text="USA / BR"
+title.TextScaled=true
+title.TextColor3=Color3.fromRGB(255,255,255)
+title.Parent=frame
 
-		AUTO = "AUTO",
-		PLAYER = "PLAYER",
-		SETTINGS = "SETTINGS",
+local function flag(name,emoji,pos,texto)
+	local b=Instance.new("TextButton")
+	b.Name=name
+	b.Size=UDim2.new(0,140,0,90)
+	b.Position=UDim2.new(0,pos,0,70)
+	b.BackgroundTransparency=1
+	b.Text=emoji
+	b.TextScaled=true
+	b.Parent=frame
 
-		LANGUAGE_SELECT = "What is your language?",
-		ENGLISH = "ENGLISH",
-		PORTUGUESE = "PORTUGUESE"
-	},
+	local t=Instance.new("TextLabel")
+	t.Size=UDim2.new(0,140,0,30)
+	t.Position=UDim2.new(0,pos,0,170)
+	t.BackgroundTransparency=1
+	t.Text=texto
+	t.TextScaled=true
+	t.TextColor3=Color3.new(1,1,1)
+	t.Parent=frame
 
-	PT = {
-		TITLE = "USA / BR",
-		CLOSE = "X",
-		MIN = "-",
-		CONFIRM = "Tem certeza que deseja fechar o menu?",
-		YES = "SIM",
-		NO = "NÃO",
+	return b
+end
 
-		AUTO = "AUTO",
-		PLAYER = "PLAYER",
-		SETTINGS = "CONFIGURAÇÕES",
-
-		LANGUAGE_SELECT = "Qual a sua linguagem?",
-		ENGLISH = "INGLÊS",
-		PORTUGUESE = "PORTUGUÊS"
-	}
-}
+local usa=flag("USA","🇺🇸",40,"ENGLISH")
+local br=flag("BR","🇧🇷",220,"PORTUGUÊS")
 
 local function createMainGUI()
 
