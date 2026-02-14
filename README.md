@@ -453,13 +453,19 @@ toggleStroke.Color = Color3.fromRGB(170,0,255)
 
 toggleBtn.MouseButton1Click:Connect(function()
 
-	autoSellEnabled = not autoSellEnabled
-
 	if autoSellEnabled then
-		toggleBtn.Text = TEXT[LANG].ON
-	else
-		toggleBtn.Text = TEXT[LANG].OFF
-	end
+    local stand=acharStand(hrp)
+    if stand then
+        local part=getPart(stand)
+        if part then
+            teleportar(part,hrp)
+            ativarClickDetector(stand)
+            spamE(20)
+            spamMouse(20)
+            clicarBotao()
+        end
+    end
+end
 
 end)
 
