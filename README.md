@@ -347,138 +347,129 @@ local function createMainGUI()
 	min.Text = TEXT[LANG].MIN
 	min.Parent = mainFrame
 
-	-------------------------------------------------
-	-- NAV BAR
-	-------------------------------------------------
-	local navFrame = Instance.new("Frame")
-	navFrame.Size = UDim2.new(1,0,0,50)
-	navFrame.Position = UDim2.new(0,0,0,60)
-	navFrame.BackgroundTransparency = 1
-	navFrame.Parent = mainFrame
+-------------------------------------------------
+-- NAV BAR
+-------------------------------------------------
 
-	local layout = Instance.new("UIListLayout")
-	layout.FillDirection = Enum.FillDirection.Horizontal
-	layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-	layout.Padding = UDim.new(0,25)
-	layout.Parent = navFrame
+local navFrame = Instance.new("Frame")
+navFrame.Size = UDim2.new(1,0,0,50)
+navFrame.Position = UDim2.new(0,0,0,60)
+navFrame.BackgroundTransparency = 1
+navFrame.Parent = mainFrame
 
-	local navButtons = {}
+-------------------------------------------------
+-- LAYOUT CENTRAL
+-------------------------------------------------
 
-	local function createNav(text)
+local layout = Instance.new("UIListLayout")
+layout.FillDirection = Enum.FillDirection.Horizontal
+layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+layout.VerticalAlignment = Enum.VerticalAlignment.Center
+layout.Padding = UDim.new(0,35)
+layout.Parent = navFrame
 
-		local holder = Instance.new("Frame")
-		holder.Size = UDim2.new(0,140,1,0)
-		holder.BackgroundTransparency = 1
-		holder.Parent = navFrame
+-------------------------------------------------
+-- PAGE CONTAINER
+-------------------------------------------------
 
-		local btn = Instance.new("TextButton")
-		btn.Size = UDim2.new(1,0,0.7,0)
-		btn.BackgroundTransparency = 1
-		btn.Text = text
-		btn.TextScaled = true
-		btn.Font = Enum.Font.GothamBold
-		btn.TextColor3 = Color3.fromRGB(170,170,170)
-		btn.Parent = holder
+local pageContainer = Instance.new("Frame")
+pageContainer.Size = UDim2.new(1,0,1,-110)
+pageContainer.Position = UDim2.new(0,0,0,110)
+pageContainer.BackgroundTransparency = 1
+pageContainer.Parent = mainFrame
 
-		local line = Instance.new("Frame")
-		line.Size = UDim2.new(1,0,0,3)
-		line.Position = UDim2.new(0,0,1,-3)
-		line.BackgroundColor3 = Color3.fromRGB(170,0,255)
-		line.Visible = false
-		line.Parent = holder
+-------------------------------------------------
+-- PAGES
+-------------------------------------------------
 
-		table.insert(navButtons,{btn=btn,line=line})
+local autoPage = Instance.new("Frame")
+autoPage.Size = UDim2.new(1,0,1,0)
+autoPage.BackgroundTransparency = 1
+autoPage.Parent = pageContainer
 
-		btn.MouseButton1Click:Connect(function()
+local playerPage = Instance.new("Frame")
+playerPage.Size = UDim2.new(1,0,1,0)
+playerPage.BackgroundTransparency = 1
+playerPage.Visible = false
+playerPage.Parent = pageContainer
 
-			for _,v in pairs(navButtons) do
-				v.btn.TextColor3 = Color3.fromRGB(170,170,170)
-				v.line.Visible = false
-			end
+local settingsPage = Instance.new("Frame")
+settingsPage.Size = UDim2.new(1,0,1,0)
+settingsPage.BackgroundTransparency = 1
+settingsPage.Visible = false
+settingsPage.Parent = pageContainer
 
-			btn.TextColor3 = Color3.fromRGB(255,255,255)
-			line.Visible = true
+-------------------------------------------------
+-- SWITCH PAGE
+-------------------------------------------------
 
-		end)
-
-		return btn
-	end
-
-	local auto = createNav("AUTO")
-	local playerNav = createNav("PLAYER")
-	local settings = createNav("SETTINGS")
-
-	auto:Activate()
-
-	-------------------------------------------------
-	-- CONFIRM GUI
-	-------------------------------------------------
-	local confirm = Instance.new("Frame")
-	confirm.Size = UDim2.new(0,400,0,200)
-	confirm.Position = UDim2.new(0.5,-200,0.5,-100)
-	confirm.BackgroundColor3 = Color3.fromRGB(0,0,0)
-	confirm.Visible = false
-	confirm.Parent = gui
-
-	local txt = Instance.new("TextLabel")
-	txt.Size = UDim2.new(1,0,0.5,0)
-	txt.BackgroundTransparency = 1
-	txt.Text = TEXT[LANG].CONFIRM
-	txt.TextScaled = true
-	txt.TextColor3 = Color3.fromRGB(255,255,255)
-	txt.Parent = confirm
-
-	local yes = Instance.new("TextButton")
-	yes.Size = UDim2.new(0.4,0,0.3,0)
-	yes.Position = UDim2.new(0.1,0,0.6,0)
-	yes.Text = "✅ "..TEXT[LANG].YES
-	yes.Parent = confirm
-
-	local no = Instance.new("TextButton")
-	no.Size = UDim2.new(0.4,0,0.3,0)
-	no.Position = UDim2.new(0.5,0,0.6,0)
-	no.Text = "❌ "..TEXT[LANG].NO
-	no.Parent = confirm
-
-	-------------------------------------------------
-	-- EVENTS
-	-------------------------------------------------
-	openButton.MouseButton1Click:Connect(function()
-		mainFrame.Visible = true
-	end)
-
-	min.MouseButton1Click:Connect(function()
-		mainFrame.Visible = false
-	end)
-
-	close.MouseButton1Click:Connect(function()
-		confirm.Visible = true
-		blur.Size = 20
-	end)
-
-	no.MouseButton1Click:Connect(function()
-		confirm.Visible = false
-		blur.Size = 0
-	end)
-
-	yes.MouseButton1Click:Connect(function()
-		gui:Destroy()
-		blur.Size = 0
-	end)
-
+local function switchPage(page)
+	autoPage.Visible = false
+	playerPage.Visible = false
+	settingsPage.Visible = false
+	
+	page.Visible = true
 end
 
 -------------------------------------------------
--- LANGUAGE EVENTS
+-- NAV BUTTON SYSTEM
 -------------------------------------------------
-usaFlag.MouseButton1Click:Connect(function()
-	LANG = "EN"
-	langGui:Destroy()
-	createMainGUI()
-end)
 
-brFlag.MouseButton1Click:Connect(function()
-	LANG = "PT"
-	langGui:Destroy()
-	createMainGUI()
-end)
+local navButtons = {}
+
+local function createNav(text, page)
+
+	local holder = Instance.new("Frame")
+	holder.Size = UDim2.new(0,160,1,0)
+	holder.BackgroundTransparency = 1
+	holder.Parent = navFrame
+
+	local btn = Instance.new("TextButton")
+	btn.Size = UDim2.new(1,0,0.7,0)
+	btn.BackgroundTransparency = 1
+	btn.Text = text
+	btn.TextScaled = true
+	btn.Font = Enum.Font.GothamBold
+	btn.TextColor3 = Color3.fromRGB(170,170,170)
+	btn.Parent = holder
+
+	local line = Instance.new("Frame")
+	line.Size = UDim2.new(1,0,0,3)
+	line.Position = UDim2.new(0,0,1,-3)
+	line.BackgroundColor3 = Color3.fromRGB(170,0,255)
+	line.Visible = false
+	line.Parent = holder
+
+	table.insert(navButtons,{btn=btn,line=line,page=page})
+
+	btn.MouseButton1Click:Connect(function()
+
+		for _,v in pairs(navButtons) do
+			v.btn.TextColor3 = Color3.fromRGB(170,170,170)
+			v.line.Visible = false
+		end
+
+		btn.TextColor3 = Color3.fromRGB(255,255,255)
+		line.Visible = true
+		switchPage(page)
+
+	end)
+
+	return btn
+end
+
+-------------------------------------------------
+-- CREATE NAV BUTTONS
+-------------------------------------------------
+
+local autoBtn = createNav("AUTO", autoPage)
+local playerBtn = createNav("PLAYER", playerPage)
+local settingsBtn = createNav("SETTINGS", settingsPage)
+
+-------------------------------------------------
+-- DEFAULT SELECT AUTO
+-------------------------------------------------
+
+autoBtn.TextColor3 = Color3.fromRGB(255,255,255)
+navButtons[1].line.Visible = true
+switchPage(autoPage)
