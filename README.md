@@ -240,14 +240,11 @@ local function createMainGUI()
 	open.TextColor3 = Color3.new(1,1,1)
 	open.Parent = gui
 
-	local strokeOpen = Instance.new("UIStroke")
+	local strokeOpen = Instance.new("UIStroke", open)
 	strokeOpen.Color = Color3.fromRGB(170,0,255)
 	strokeOpen.Thickness = 3
-	strokeOpen.Parent = open
 
-	local cornerOpen = Instance.new("UICorner")
-	cornerOpen.CornerRadius = UDim.new(0,12)
-	cornerOpen.Parent = open
+	Instance.new("UICorner", open).CornerRadius = UDim.new(0,12)
 
 	-------------------------------------------------
 	-- MAIN MENU
@@ -261,14 +258,11 @@ local function createMainGUI()
 	main.Visible = false
 	main.Parent = gui
 
-	local strokeMain = Instance.new("UIStroke")
+	local strokeMain = Instance.new("UIStroke", main)
 	strokeMain.Color = Color3.fromRGB(170,0,255)
 	strokeMain.Thickness = 4
-	strokeMain.Parent = main
 
-	local cornerMain = Instance.new("UICorner")
-	cornerMain.CornerRadius = UDim.new(0,10)
-	cornerMain.Parent = main
+	Instance.new("UICorner", main).CornerRadius = UDim.new(0,10)
 
 	-------------------------------------------------
 	-- TITLE
@@ -315,21 +309,18 @@ local function createMainGUI()
 	confirm.Visible = false
 	confirm.Parent = gui
 
-	local confirmStroke = Instance.new("UIStroke")
+	local confirmStroke = Instance.new("UIStroke", confirm)
 	confirmStroke.Color = Color3.fromRGB(170,0,255)
 	confirmStroke.Thickness = 3
-	confirmStroke.Parent = confirm
 
-	local confirmCorner = Instance.new("UICorner")
-	confirmCorner.CornerRadius = UDim.new(0,10)
-	confirmCorner.Parent = confirm
+	Instance.new("UICorner", confirm).CornerRadius = UDim.new(0,10)
 
 	local txt = Instance.new("TextLabel")
 	txt.Size = UDim2.new(1,0,0.5,0)
 	txt.BackgroundTransparency = 1
 	txt.Text = TEXT[LANG].CONFIRM
 	txt.TextScaled = true
-	txt.TextColor3 = Color3.fromRGB(255,255,255)
+	txt.TextColor3 = Color3.new(1,1,1)
 	txt.Parent = confirm
 
 	local yes = Instance.new("TextButton")
@@ -343,6 +334,84 @@ local function createMainGUI()
 	no.Position = UDim2.new(0.5,0,0.6,0)
 	no.Text = "❌ "..TEXT[LANG].NO
 	no.Parent = confirm
+
+	-------------------------------------------------
+	-- NAV BAR
+	-------------------------------------------------
+
+	local nav = Instance.new("Frame")
+	nav.Size = UDim2.new(1,0,0,50)
+	nav.Position = UDim2.new(0,0,0,50)
+	nav.BackgroundTransparency = 1
+	nav.Parent = main
+
+	local pages = Instance.new("Frame")
+	pages.Size = UDim2.new(1,0,1,-100)
+	pages.Position = UDim2.new(0,0,0,100)
+	pages.BackgroundTransparency = 1
+	pages.Parent = main
+
+	local auto = Instance.new("Frame", pages)
+	auto.Size = UDim2.new(1,0,1,0)
+	auto.BackgroundTransparency = 1
+
+	local playerP = auto:Clone()
+	playerP.Parent = pages
+	playerP.Visible = false
+
+	local settings = auto:Clone()
+	settings.Parent = pages
+	settings.Visible = false
+
+	local function switch(p)
+		auto.Visible = false
+		playerP.Visible = false
+		settings.Visible = false
+		p.Visible = true
+	end
+
+	local btns = {}
+
+	local function navBtn(text,x,page)
+		local hold = Instance.new("Frame", nav)
+		hold.Size = UDim2.new(0,150,0,45)
+		hold.Position = UDim2.new(0,x,0,5)
+		hold.BackgroundTransparency = 1
+
+		local b = Instance.new("TextButton", hold)
+		b.Size = UDim2.new(1,0,1,0)
+		b.BackgroundTransparency = 1
+		b.Text = text
+		b.TextScaled = true
+		b.Font = Enum.Font.GothamBold
+		b.TextColor3 = Color3.fromRGB(170,170,170)
+
+		local line = Instance.new("Frame", hold)
+		line.Size = UDim2.new(1,0,0,3)
+		line.Position = UDim2.new(0,0,1,-3)
+		line.BackgroundColor3 = Color3.fromRGB(170,0,255)
+		line.Visible = false
+
+		table.insert(btns,{b=b,l=line,p=page})
+
+		b.MouseButton1Click:Connect(function()
+			for _,v in pairs(btns) do
+				v.b.TextColor3 = Color3.fromRGB(170,170,170)
+				v.l.Visible = false
+			end
+			b.TextColor3 = Color3.new(1,1,1)
+			line.Visible = true
+			switch(page)
+		end)
+	end
+
+	navBtn("AUTO",20,auto)
+	navBtn("PLAYER",190,playerP)
+	navBtn("SETTINGS",360,settings)
+
+	btns[1].b.TextColor3 = Color3.new(1,1,1)
+	btns[1].l.Visible = true
+	switch(auto)
 
 	-------------------------------------------------
 	-- EVENTS
