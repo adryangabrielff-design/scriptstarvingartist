@@ -407,7 +407,7 @@ end)
 	local auto=Instance.new("Frame",pages)
 	
 -------------------------------------------------
--- AUTO SELL ART TOGGLE (SWITCH STYLE)
+-- AUTO SELL ART TOGGLE
 -------------------------------------------------
 
 local autoSellEnabled = false
@@ -424,79 +424,113 @@ local holderStroke = Instance.new("UIStroke", autoSellHolder)
 holderStroke.Color = Color3.fromRGB(170,0,255)
 holderStroke.Thickness = 2
 
--- TEXTO
 local autoSellText = Instance.new("TextLabel", autoSellHolder)
-autoSellText.Size = UDim2.new(0.6,0,1,0)
+autoSellText.Size = UDim2.new(0.65,0,1,0)
 autoSellText.BackgroundTransparency = 1
 autoSellText.Text = TEXT[LANG].AUTO_SELL_ART
 autoSellText.TextScaled = true
 autoSellText.Font = Enum.Font.GothamBold
 autoSellText.TextColor3 = Color3.new(1,1,1)
 
--------------------------------------------------
--- SWITCH BASE
--------------------------------------------------
+local toggleBtn = Instance.new("TextButton", autoSellHolder)
+toggleBtn.Size = UDim2.new(0.35,0,0.7,0)
+toggleBtn.Position = UDim2.new(0.63,0,0.15,0)
+toggleBtn.BackgroundColor3 = Color3.fromRGB(40,0,60)
+toggleBtn.Text = TEXT[LANG].OFF
+toggleBtn.TextScaled = true
+toggleBtn.Font = Enum.Font.GothamBold
+toggleBtn.TextColor3 = Color3.fromRGB(170,0,255)
 
-local switch = Instance.new("Frame", autoSellHolder)
-switch.Size = UDim2.new(0,70,0,30)
-switch.Position = UDim2.new(1,-80,0.5,-15)
-switch.BackgroundColor3 = Color3.fromRGB(90,90,90) -- cinza desligado
+local toggleCorner = Instance.new("UICorner", toggleBtn)
+toggleCorner.CornerRadius = UDim.new(0,8)
 
-local switchCorner = Instance.new("UICorner", switch)
-switchCorner.CornerRadius = UDim.new(1,0)
-
--------------------------------------------------
--- SWITCH BOLINHA
--------------------------------------------------
-
-local knob = Instance.new("Frame", switch)
-knob.Size = UDim2.new(0,26,0,26)
-knob.Position = UDim2.new(0,2,0.5,-13)
-knob.BackgroundColor3 = Color3.new(1,1,1)
-
-local knobCorner = Instance.new("UICorner", knob)
-knobCorner.CornerRadius = UDim.new(1,0)
+local toggleStroke = Instance.new("UIStroke", toggleBtn)
+toggleStroke.Color = Color3.fromRGB(170,0,255)
 
 -------------------------------------------------
--- FUNÇÃO VISUAL
+-- TOGGLE FUNCTION
 -------------------------------------------------
 
-local function updateSwitch()
+toggleBtn.MouseButton1Click:Connect(function()
 
 	if autoSellEnabled then
-		switch.BackgroundColor3 = Color3.fromRGB(0,170,0) -- verde
-		knob:TweenPosition(
-			UDim2.new(1,-28,0.5,-13),
-			Enum.EasingDirection.Out,
-			Enum.EasingStyle.Quad,
-			0.15,
-			true
-		)
-	else
-		switch.BackgroundColor3 = Color3.fromRGB(90,90,90) -- cinza
-		knob:TweenPosition(
-			UDim2.new(0,2,0.5,-13),
-			Enum.EasingDirection.Out,
-			Enum.EasingStyle.Quad,
-			0.15,
-			true
-		)
-	end
-
+    local stand=acharStand(hrp)
+    if stand then
+        local part=getPart(stand)
+        if part then
+            teleportar(part,hrp)
+            ativarClickDetector(stand)
+            spamE(20)
+            spamMouse(20)
+            clicarBotao()
+        end
+    end
 end
 
--------------------------------------------------
--- CLICK SWITCH
--------------------------------------------------
-
-switch.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then
-		autoSellEnabled = not autoSellEnabled
-		updateSwitch()
-	end
 end)
 
-updateSwitch()
+	auto.Size=UDim2.new(1,0,1,0)
+	auto.BackgroundTransparency=1
+
+	local playerP=auto:Clone()
+	playerP.Parent=pages
+	playerP.Visible=false
+
+	local settings=auto:Clone()
+	settings.Parent=pages
+	settings.Visible=false
+
+	local function switch(p)
+		auto.Visible=false
+		playerP.Visible=false
+		settings.Visible=false
+		p.Visible=true
+	end
+
+	local btns={}
+
+	local function navBtn(text,x,page)
+		local hold=Instance.new("Frame",nav)
+		hold.Size=UDim2.new(0,150,0,45)
+		hold.Position=UDim2.new(0,x,0,5)
+		hold.BackgroundTransparency=1
+
+		local b=Instance.new("TextButton",hold)
+		b.Size=UDim2.new(1,0,1,0)
+		b.BackgroundTransparency=1
+		b.Text=text
+		b.TextScaled=true
+		b.Font=Enum.Font.GothamBold
+		b.TextColor3=Color3.fromRGB(170,170,170)
+
+		local line=Instance.new("Frame",hold)
+		line.Size=UDim2.new(1,0,0,3)
+		line.Position=UDim2.new(0,0,1,-3)
+		line.BackgroundColor3=Color3.fromRGB(170,0,255)
+		line.Visible=false
+
+		table.insert(btns,{b=b,l=line,p=page})
+
+		b.MouseButton1Click:Connect(function()
+			for _,v in pairs(btns) do
+				v.b.TextColor3=Color3.fromRGB(170,170,170)
+				v.l.Visible=false
+			end
+			b.TextColor3=Color3.new(1,1,1)
+			line.Visible=true
+			switch(page)
+		end)
+	end
+
+	navBtn(TEXT[LANG].AUTO,20,auto)
+    navBtn(TEXT[LANG].PLAYER,190,playerP)
+    navBtn(TEXT[LANG].SETTINGS,360,settings)
+
+	btns[1].b.TextColor3=Color3.new(1,1,1)
+	btns[1].l.Visible=true
+	switch(auto)
+
+end
 
 -------------------------------------------------
 -- LANGUAGE EVENTS
