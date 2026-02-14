@@ -224,38 +224,76 @@ local br=flag("BR","🇧🇷",220,"PORTUGUÊS")
 -------------------------------------------------
 local function createMainGUI()
 
-	local gui=Instance.new("ScreenGui",PlayerGui)
+	local gui = Instance.new("ScreenGui",PlayerGui)
 
-	local open=Instance.new("TextButton")
-	open.Size=UDim2.new(0,60,0,60)
-	open.Position=UDim2.new(0,10,0,20)
-	open.BackgroundColor3=Color3.new(0,0,0)
-	open.Text="⚠️"
-	open.TextScaled=true
-	open.Parent=gui
+	-------------------------------------------------
+	-- OPEN BUTTON (BONITO)
+	-------------------------------------------------
 
-	Instance.new("UIStroke",open).Color=Color3.fromRGB(170,0,255)
+	local open = Instance.new("TextButton")
+	open.Size = UDim2.new(0,55,0,55) -- levemente menor
+	open.Position = UDim2.new(0,10,0,20)
+	open.BackgroundColor3 = Color3.fromRGB(0,0,0)
+	open.Text = "⚠️"
+	open.TextScaled = true
+	open.TextSize = 28 -- controla tamanho visual do emoji
+	open.TextColor3 = Color3.new(1,1,1)
+	open.Parent = gui
 
-	local main=Instance.new("Frame")
-	main.Size=UDim2.new(0,700,0,500)
-	main.Position=UDim2.new(0.5,-350,0.5,-250)
-	main.BackgroundColor3=Color3.new(0,0,0)
-	main.BackgroundTransparency=0.3
-	main.Visible=false
-	main.Parent=gui
+	-- Bordas roxas iguais menu
+	local strokeOpen = Instance.new("UIStroke")
+	strokeOpen.Color = Color3.fromRGB(170,0,255)
+	strokeOpen.Thickness = 3 -- mais grosso
+	strokeOpen.Parent = open
 
-	Instance.new("UIStroke",main).Color=Color3.fromRGB(170,0,255)
+	-- Cantos arredondados
+	local cornerOpen = Instance.new("UICorner")
+	cornerOpen.CornerRadius = UDim.new(0,12) -- arredondado mas não círculo
+	cornerOpen.Parent = open
 
-	local title=Instance.new("TextLabel")
-	title.Size=UDim2.new(1,0,0,50)
-	title.BackgroundTransparency=1
-	title.Text=TEXT[LANG].TITLE
-	title.TextScaled=true
-	title.TextColor3=Color3.new(1,1,1)
-	title.Parent=main
+
+	-------------------------------------------------
+	-- MAIN MENU (MENOR + BORDA MAIS GROSSA)
+	-------------------------------------------------
+
+	local main = Instance.new("Frame")
+	main.Size = UDim2.new(0,660,0,460) -- levemente menor
+	main.Position = UDim2.new(0.5,-330,0.5,-230)
+	main.BackgroundColor3 = Color3.fromRGB(0,0,0)
+	main.BackgroundTransparency = 0.3
+	main.Visible = false
+	main.Parent = gui
+
+	local strokeMain = Instance.new("UIStroke")
+	strokeMain.Color = Color3.fromRGB(170,0,255)
+	strokeMain.Thickness = 4 -- borda mais grossa que antes
+	strokeMain.Parent = main
+
+	-- Cantos levemente arredondados menu
+	local cornerMain = Instance.new("UICorner")
+	cornerMain.CornerRadius = UDim.new(0,10)
+	cornerMain.Parent = main
+
+
+	-------------------------------------------------
+	-- TITLE
+	-------------------------------------------------
+
+	local title = Instance.new("TextLabel")
+	title.Size = UDim2.new(1,0,0,50)
+	title.BackgroundTransparency = 1
+	title.Text = TEXT[LANG].TITLE
+	title.TextScaled = true
+	title.TextColor3 = Color3.new(1,1,1)
+	title.Parent = main
+
+
+	-------------------------------------------------
+	-- OPEN EVENT
+	-------------------------------------------------
 
 	open.MouseButton1Click:Connect(function()
-		main.Visible=not main.Visible
+		main.Visible = not main.Visible
 	end)
 
 	-------------------------------------------------
