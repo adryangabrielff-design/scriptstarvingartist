@@ -223,14 +223,13 @@ local br=flag("BR","🇧🇷",220,"PORTUGUÊS")
 -- MAIN GUI
 -------------------------------------------------
 local function createMainGUI()
-
-	local open=Instance.new("TextButton")
+local open=Instance.new("TextButton")
 open.Size=UDim2.new(0,60,0,60)
 open.Position=UDim2.new(0,10,0,20)
 open.BackgroundColor3=Color3.new(0,0,0)
 open.Text="⚠"
 open.TextScaled=false
-open.TextSize=32
+open.TextSize=28
 open.TextColor3=Color3.new(1,1,1)
 open.Parent=gui
 
