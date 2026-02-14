@@ -340,7 +340,7 @@ local function createMainGUI()
 	-------------------------------------------------
 
 	local openButton = Instance.new("TextButton")
-	openButton.Size = UDim2.new(0,60,0,60)
+	openButton.Size = UDim2.new(0,30,0,30)
 	openButton.Position = UDim2.new(0,10,0,20)
 	openButton.BackgroundColor3 = Color3.fromRGB(0,0,0)
 	openButton.Text = "⚠️"
