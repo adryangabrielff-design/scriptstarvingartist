@@ -243,12 +243,209 @@ local function createMainGUI()
 	btns[1].l.Visible=true
 	switch(auto)
 
+	local function createMainGUI()
+
+	local gui = Instance.new("ScreenGui")
+	gui.Parent = PlayerGui
+	gui.ResetOnSpawn = false
+
 	-------------------------------------------------
-	-- OPEN BUTTON EVENT
+	-- OPEN BUTTON
+	-------------------------------------------------
+
+	local open = Instance.new("TextButton", gui)
+	open.Size = UDim2.new(0,55,0,55)
+	open.Position = UDim2.new(0,10,0,20)
+	open.BackgroundColor3 = Color3.fromRGB(0,0,0)
+	open.Text = "⚠️"
+	open.TextScaled = true
+	open.TextColor3 = Color3.new(1,1,1)
+
+	Instance.new("UICorner", open).CornerRadius = UDim.new(0,12)
+
+	local openStroke = Instance.new("UIStroke", open)
+	openStroke.Color = Color3.fromRGB(170,0,255)
+	openStroke.Thickness = 3
+
+	-------------------------------------------------
+	-- MAIN FRAME
+	-------------------------------------------------
+
+	local main = Instance.new("Frame", gui)
+	main.Size = UDim2.new(0,660,0,460)
+	main.Position = UDim2.new(0.5,-330,0.5,-230)
+	main.BackgroundColor3 = Color3.fromRGB(0,0,0)
+	main.BackgroundTransparency = 0.3
+	main.Visible = false
+
+	Instance.new("UICorner", main).CornerRadius = UDim.new(0,10)
+
+	local mainStroke = Instance.new("UIStroke", main)
+	mainStroke.Color = Color3.fromRGB(170,0,255)
+	mainStroke.Thickness = 4
+
+	-------------------------------------------------
+	-- TITLE
+	-------------------------------------------------
+
+	local title = Instance.new("TextLabel", main)
+	title.Size = UDim2.new(1,0,0,50)
+	title.BackgroundTransparency = 1
+	title.Text = TEXT[LANG].TITLE
+	title.TextScaled = true
+	title.TextColor3 = Color3.new(1,1,1)
+
+	-------------------------------------------------
+	-- CLOSE (X) / MIN (-)
+	-------------------------------------------------
+
+	local close = Instance.new("TextButton", main)
+	close.Size = UDim2.new(0,50,0,50)
+	close.Position = UDim2.new(1,-60,0,5)
+	close.BackgroundTransparency = 1
+	close.Text = TEXT[LANG].CLOSE
+	close.TextScaled = true
+	close.TextColor3 = Color3.new(1,1,1)
+
+	local min = Instance.new("TextButton", main)
+	min.Size = UDim2.new(0,50,0,50)
+	min.Position = UDim2.new(1,-120,0,5)
+	min.BackgroundTransparency = 1
+	min.Text = TEXT[LANG].MIN
+	min.TextScaled = true
+	min.TextColor3 = Color3.new(1,1,1)
+
+	-------------------------------------------------
+	-- NAV BAR
+	-------------------------------------------------
+
+	local nav = Instance.new("Frame", main)
+	nav.Size = UDim2.new(1,0,0,50)
+	nav.Position = UDim2.new(0,0,0,50)
+	nav.BackgroundTransparency = 1
+
+	local pages = Instance.new("Frame", main)
+	pages.Size = UDim2.new(1,0,1,-100)
+	pages.Position = UDim2.new(0,0,0,100)
+	pages.BackgroundTransparency = 1
+
+	local auto = Instance.new("Frame", pages)
+	auto.Size = UDim2.new(1,0,1,0)
+	auto.BackgroundTransparency = 1
+
+	local playerP = auto:Clone()
+	playerP.Parent = pages
+	playerP.Visible = false
+
+	local settings = auto:Clone()
+	settings.Parent = pages
+	settings.Visible = false
+
+	local function switch(page)
+		auto.Visible = false
+		playerP.Visible = false
+		settings.Visible = false
+		page.Visible = true
+	end
+
+	local buttons = {}
+
+	local function navBtn(text, x, page)
+		local holder = Instance.new("Frame", nav)
+		holder.Size = UDim2.new(0,150,0,45)
+		holder.Position = UDim2.new(0,x,0,5)
+		holder.BackgroundTransparency = 1
+
+		local btn = Instance.new("TextButton", holder)
+		btn.Size = UDim2.new(1,0,1,0)
+		btn.BackgroundTransparency = 1
+		btn.Text = text
+		btn.TextScaled = true
+		btn.Font = Enum.Font.GothamBold
+		btn.TextColor3 = Color3.fromRGB(170,170,170)
+
+		local line = Instance.new("Frame", holder)
+		line.Size = UDim2.new(1,0,0,3)
+		line.Position = UDim2.new(0,0,1,-3)
+		line.BackgroundColor3 = Color3.fromRGB(170,0,255)
+		line.Visible = false
+
+		table.insert(buttons, {b=btn,l=line,p=page})
+
+		btn.MouseButton1Click:Connect(function()
+			for _,v in pairs(buttons) do
+				v.b.TextColor3 = Color3.fromRGB(170,170,170)
+				v.l.Visible = false
+			end
+			btn.TextColor3 = Color3.new(1,1,1)
+			line.Visible = true
+			switch(page)
+		end)
+	end
+
+	navBtn("AUTO",20,auto)
+	navBtn("PLAYER",190,playerP)
+	navBtn("SETTINGS",360,settings)
+
+	buttons[1].b.TextColor3 = Color3.new(1,1,1)
+	buttons[1].l.Visible = true
+	switch(auto)
+
+	-------------------------------------------------
+	-- CONFIRM CLOSE GUI
+	-------------------------------------------------
+
+	local confirm = Instance.new("Frame", gui)
+	confirm.Size = UDim2.new(0,400,0,200)
+	confirm.Position = UDim2.new(0.5,-200,0.5,-100)
+	confirm.BackgroundColor3 = Color3.fromRGB(0,0,0)
+	confirm.Visible = false
+
+	Instance.new("UICorner", confirm).CornerRadius = UDim.new(0,10)
+	Instance.new("UIStroke", confirm).Color = Color3.fromRGB(170,0,255)
+
+	local txt = Instance.new("TextLabel", confirm)
+	txt.Size = UDim2.new(1,0,0.5,0)
+	txt.BackgroundTransparency = 1
+	txt.Text = TEXT[LANG].CONFIRM
+	txt.TextScaled = true
+	txt.TextColor3 = Color3.new(1,1,1)
+
+	local yes = Instance.new("TextButton", confirm)
+	yes.Size = UDim2.new(0.4,0,0.3,0)
+	yes.Position = UDim2.new(0.1,0,0.6,0)
+	yes.Text = "✅ "..TEXT[LANG].YES
+
+	local no = Instance.new("TextButton", confirm)
+	no.Size = UDim2.new(0.4,0,0.3,0)
+	no.Position = UDim2.new(0.5,0,0.6,0)
+	no.Text = "❌ "..TEXT[LANG].NO
+
+	-------------------------------------------------
+	-- EVENTS
 	-------------------------------------------------
 
 	open.MouseButton1Click:Connect(function()
 		main.Visible = not main.Visible
+	end)
+
+	min.MouseButton1Click:Connect(function()
+		main.Visible = false
+	end)
+
+	close.MouseButton1Click:Connect(function()
+		confirm.Visible = true
+		blur.Size = 20
+	end)
+
+	no.MouseButton1Click:Connect(function()
+		confirm.Visible = false
+		blur.Size = 0
+	end)
+
+	yes.MouseButton1Click:Connect(function()
+		gui:Destroy()
+		blur.Size = 0
 	end)
 
 end
