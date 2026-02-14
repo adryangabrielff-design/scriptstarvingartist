@@ -227,7 +227,7 @@ local function createMainGUI()
 	local gui=Instance.new("ScreenGui",PlayerGui)
 
 	local open=Instance.new("TextButton")
-	open.Size=UDim2.new(0,60,0,50)
+	open.Size=UDim2.new(0,60,0,60)
 	open.Position=UDim2.new(0,10,0,20)
 	open.BackgroundColor3=Color3.new(0,0,0)
 	open.Text="⚠️"
