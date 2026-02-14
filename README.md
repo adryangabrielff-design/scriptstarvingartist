@@ -219,50 +219,57 @@ end
 local usa=flag("USA","🇺🇸",40,"ENGLISH")
 local br=flag("BR","🇧🇷",220,"PORTUGUÊS")
 
--------------------------------------------------
--- MAIN GUI
--------------------------------------------------
 local function createMainGUI()
-local open=Instance.new("TextButton")
-open.Size=UDim2.new(0,60,0,60)
-open.Position=UDim2.new(0,10,0,20)
-open.BackgroundColor3=Color3.new(0,0,0)
-open.Text="⚠"
-open.TextScaled=false
-open.TextSize=28
-open.TextColor3=Color3.new(1,1,1)
-open.Parent=gui
 
--- Cantos arredondados
-local openCorner=Instance.new("UICorner",open)
-openCorner.CornerRadius=UDim.new(0,14)
+	local gui = Instance.new("ScreenGui")
+	gui.Parent = PlayerGui
+	gui.ResetOnSpawn = false
 
--- Borda roxa
-local openStroke=Instance.new("UIStroke",open)
-openStroke.Color=Color3.fromRGB(170,0,255)
-openStroke.Thickness=2.5
+	-------------------------------------------------
+	-- OPEN BUTTON
+	-------------------------------------------------
+
+	local open=Instance.new("TextButton")
+	open.Size=UDim2.new(0,60,0,60)
+	open.Position=UDim2.new(0,10,0,20)
+	open.BackgroundColor3=Color3.new(0,0,0)
+	open.Text="⚠"
+	open.TextScaled=false
+	open.TextSize=28
+	open.TextColor3=Color3.new(1,1,1)
+	open.Parent=gui
+
+	local openCorner=Instance.new("UICorner",open)
+	openCorner.CornerRadius=UDim.new(0,14)
+
+	local openStroke=Instance.new("UIStroke",open)
+	openStroke.Color=Color3.fromRGB(170,0,255)
+	openStroke.Thickness=2.5
 
 
--------------------------------------------------
--- MENU PRINCIPAL (MENOR + BORDA MAIS GROSSA)
--------------------------------------------------
+	-------------------------------------------------
+	-- MENU PRINCIPAL
+	-------------------------------------------------
 
-local main=Instance.new("Frame")
-main.Size=UDim2.new(0,660,0,470) -- antes 700x500
-main.Position=UDim2.new(0.5,-330,0.5,-235)
-main.BackgroundColor3=Color3.new(0,0,0)
-main.BackgroundTransparency=0.3
-main.Visible=false
-main.Parent=gui
+	local main=Instance.new("Frame")
+	main.Size=UDim2.new(0,660,0,470)
+	main.Position=UDim2.new(0.5,-330,0.5,-235)
+	main.BackgroundColor3=Color3.new(0,0,0)
+	main.BackgroundTransparency=0.3
+	main.Visible=false
+	main.Parent=gui
 
--- Cantos arredondados menu
-local mainCorner=Instance.new("UICorner",main)
-mainCorner.CornerRadius=UDim.new(0,12)
+	local mainCorner=Instance.new("UICorner",main)
+	mainCorner.CornerRadius=UDim.new(0,12)
 
--- Borda roxa mais grossa
-local mainStroke=Instance.new("UIStroke",main)
-mainStroke.Color=Color3.fromRGB(170,0,255)
-mainStroke.Thickness=4
+	local mainStroke=Instance.new("UIStroke",main)
+	mainStroke.Color=Color3.fromRGB(170,0,255)
+	mainStroke.Thickness=4
+
+	open.MouseButton1Click:Connect(function()
+		main.Visible = not main.Visible
+	end)
+
 
 	-------------------------------------------------
 	-- NAV BAR
