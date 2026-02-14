@@ -298,7 +298,7 @@ closeStroke.Thickness = 2
 local closeBtn = Instance.new("TextButton", closeHolder)
 closeBtn.Size = UDim2.new(1,0,1,0)
 closeBtn.BackgroundTransparency = 1
-closeBtn.Text = "X"
+closeBtn.Text = TEXT[LANG].CLOSE
 closeBtn.TextScaled = true
 closeBtn.Font = Enum.Font.GothamBold
 closeBtn.TextColor3 = Color3.fromRGB(170,0,255)
@@ -312,7 +312,7 @@ miniHolder.Parent = main
 miniHolder.Position = UDim2.new(1,-90,0,10)
 
 local miniBtn = miniHolder:FindFirstChildOfClass("TextButton")
-miniBtn.Text = "-"
+miniBtn.Text = TEXT[LANG].MIN
 
 -------------------------------------------------
 -- MINIMIZE FUNCTION
@@ -341,7 +341,7 @@ closeBtn.MouseButton1Click:Connect(function()
 	local txt = Instance.new("TextLabel", confirm)
 	txt.Size = UDim2.new(1,0,0.5,0)
 	txt.BackgroundTransparency = 1
-	txt.Text = "Deseja fechar o menu?"
+    txt.Text = TEXT[LANG].CONFIRM_CLOSE
 	txt.TextScaled = true
 	txt.Font = Enum.Font.GothamBold
 	txt.TextColor3 = Color3.new(1,1,1)
@@ -349,7 +349,7 @@ closeBtn.MouseButton1Click:Connect(function()
 	local yes = Instance.new("TextButton", confirm)
 	yes.Size = UDim2.new(0.45,0,0.3,0)
 	yes.Position = UDim2.new(0.05,0,0.65,0)
-	yes.Text = "SIM"
+	yes.Text = TEXT[LANG].YES
 	yes.TextScaled = true
 	yes.BackgroundColor3 = Color3.fromRGB(40,0,60)
 	yes.TextColor3 = Color3.fromRGB(170,0,255)
@@ -357,7 +357,7 @@ closeBtn.MouseButton1Click:Connect(function()
 	local no = yes:Clone()
 	no.Parent = confirm
 	no.Position = UDim2.new(0.5,0,0.65,0)
-	no.Text = "NÃO"
+	no.Text = TEXT[LANG].NO
 
 	local yCorner = Instance.new("UICorner", yes)
 	local yStroke = Instance.new("UIStroke", yes)
@@ -452,9 +452,9 @@ end)
 		end)
 	end
 
-	navBtn("AUTO",20,auto)
-	navBtn("PLAYER",190,playerP)
-	navBtn("SETTINGS",360,settings)
+	navBtn(TEXT[LANG].AUTO,20,auto)
+    navBtn(TEXT[LANG].PLAYER,190,playerP)
+    navBtn(TEXT[LANG].SETTINGS,360,settings)
 
 	btns[1].b.TextColor3=Color3.new(1,1,1)
 	btns[1].l.Visible=true
