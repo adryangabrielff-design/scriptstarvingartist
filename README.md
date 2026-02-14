@@ -169,55 +169,47 @@ task.spawn(function()
 end)
 
 -------------------------------------------------
--- LANGUAGE GUI
+-- LANGUAGE SYSTEM
 -------------------------------------------------
-local langGui = Instance.new("ScreenGui")
-langGui.Parent = PlayerGui
-langGui.ResetOnSpawn=false
 
-local frame = Instance.new("Frame")
-frame.Size=UDim2.new(0,400,0,260)
-frame.Position=UDim2.new(0.5,-200,0.5,-130)
-frame.BackgroundColor3=Color3.fromRGB(0,0,0)
-frame.BackgroundTransparency=0.25
-frame.Parent=langGui
+local LANG = "EN" -- padrão
 
-local stroke=Instance.new("UIStroke",frame)
-stroke.Color=Color3.fromRGB(170,0,255)
-stroke.Thickness=3
+local TEXT = {
 
-local title=Instance.new("TextLabel")
-title.Size=UDim2.new(1,0,0,40)
-title.BackgroundTransparency=1
-title.Text="USA / BR"
-title.TextScaled=true
-title.TextColor3=Color3.fromRGB(255,255,255)
-title.Parent=frame
+	EN = {
+		TITLE = "USA / BR",
+		CLOSE = "X",
+		MIN = "-",
+		CONFIRM = "Are you sure you want to close the menu?",
+		YES = "YES",
+		NO = "NO",
 
-local function flag(name,emoji,pos,texto)
-	local b=Instance.new("TextButton")
-	b.Name=name
-	b.Size=UDim2.new(0,140,0,90)
-	b.Position=UDim2.new(0,pos,0,70)
-	b.BackgroundTransparency=1
-	b.Text=emoji
-	b.TextScaled=true
-	b.Parent=frame
+		AUTO = "AUTO",
+		PLAYER = "PLAYER",
+		SETTINGS = "SETTINGS",
 
-	local t=Instance.new("TextLabel")
-	t.Size=UDim2.new(0,140,0,30)
-	t.Position=UDim2.new(0,pos,0,170)
-	t.BackgroundTransparency=1
-	t.Text=texto
-	t.TextScaled=true
-	t.TextColor3=Color3.new(1,1,1)
-	t.Parent=frame
+		LANGUAGE_SELECT = "What is your language?",
+		ENGLISH = "ENGLISH",
+		PORTUGUESE = "PORTUGUESE"
+	},
 
-	return b
-end
+	PT = {
+		TITLE = "USA / BR",
+		CLOSE = "X",
+		MIN = "-",
+		CONFIRM = "Tem certeza que deseja fechar o menu?",
+		YES = "SIM",
+		NO = "NÃO",
 
-local usa=flag("USA","🇺🇸",40,"ENGLISH")
-local br=flag("BR","🇧🇷",220,"PORTUGUÊS")
+		AUTO = "AUTO",
+		PLAYER = "PLAYER",
+		SETTINGS = "CONFIGURAÇÕES",
+
+		LANGUAGE_SELECT = "Qual a sua linguagem?",
+		ENGLISH = "INGLÊS",
+		PORTUGUESE = "PORTUGUÊS"
+	}
+}
 
 local function createMainGUI()
 
