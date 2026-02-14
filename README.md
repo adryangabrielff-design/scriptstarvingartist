@@ -33,8 +33,11 @@ local TEXT = {
 		NO = "NÃO",
 
 		AUTO = "AUTO",
-		PLAYER = "PLAYER",
+		PLAYER = "JOGADOR",
 		SETTINGS = "CONFIGURAÇÕES",
+		AUTO_SELL_ART = "VENDER ARTE AUTOMÁTICO",
+        ON = "LIGADO",
+        OFF = "DESLIGADO",
 
 		CONFIRM_CLOSE = "Deseja fechar o menu?"
 	},
@@ -50,6 +53,9 @@ local TEXT = {
 		AUTO = "AUTO",
 		PLAYER = "PLAYER",
 		SETTINGS = "SETTINGS",
+		AUTO_SELL_ART = "AUTO SELL ART",
+        ON = "ON",
+        OFF = "OFF"
 
 		CONFIRM_CLOSE = "Do you want to close the menu?"
 	}
@@ -399,6 +405,63 @@ end)
 	pages.Parent=main
 
 	local auto=Instance.new("Frame",pages)
+	-------------------------------------------------
+-- AUTO SELL ART TOGGLE
+-------------------------------------------------
+
+local autoSellEnabled = false
+
+local autoSellHolder = Instance.new("Frame", auto)
+autoSellHolder.Size = UDim2.new(0,300,0,60)
+autoSellHolder.Position = UDim2.new(0,30,0,30)
+autoSellHolder.BackgroundColor3 = Color3.fromRGB(20,0,30)
+
+local holderCorner = Instance.new("UICorner", autoSellHolder)
+holderCorner.CornerRadius = UDim.new(0,10)
+
+local holderStroke = Instance.new("UIStroke", autoSellHolder)
+holderStroke.Color = Color3.fromRGB(170,0,255)
+holderStroke.Thickness = 2
+
+local autoSellText = Instance.new("TextLabel", autoSellHolder)
+autoSellText.Size = UDim2.new(0.65,0,1,0)
+autoSellText.BackgroundTransparency = 1
+autoSellText.Text = TEXT[LANG].AUTO_SELL_ART
+autoSellText.TextScaled = true
+autoSellText.Font = Enum.Font.GothamBold
+autoSellText.TextColor3 = Color3.new(1,1,1)
+
+local toggleBtn = Instance.new("TextButton", autoSellHolder)
+toggleBtn.Size = UDim2.new(0.35,0,0.7,0)
+toggleBtn.Position = UDim2.new(0.63,0,0.15,0)
+toggleBtn.BackgroundColor3 = Color3.fromRGB(40,0,60)
+toggleBtn.Text = TEXT[LANG].OFF
+toggleBtn.TextScaled = true
+toggleBtn.Font = Enum.Font.GothamBold
+toggleBtn.TextColor3 = Color3.fromRGB(170,0,255)
+
+local toggleCorner = Instance.new("UICorner", toggleBtn)
+toggleCorner.CornerRadius = UDim.new(0,8)
+
+local toggleStroke = Instance.new("UIStroke", toggleBtn)
+toggleStroke.Color = Color3.fromRGB(170,0,255)
+
+-------------------------------------------------
+-- TOGGLE FUNCTION
+-------------------------------------------------
+
+toggleBtn.MouseButton1Click:Connect(function()
+
+	autoSellEnabled = not autoSellEnabled
+
+	if autoSellEnabled then
+		toggleBtn.Text = TEXT[LANG].ON
+	else
+		toggleBtn.Text = TEXT[LANG].OFF
+	end
+
+end)
+
 	auto.Size=UDim2.new(1,0,1,0)
 	auto.BackgroundTransparency=1
 
